@@ -1,0 +1,29 @@
+{
+  "name": "itu",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/rc-select": "^5.9.30",
+    "@types/rc-slider": "^8.2.0",
+    "@types/react": "^16.0.25",
+    "@types/react-dom": "^16.0.3",
+    "@types/three": "^0.84.33",
+    "rc-select": "^7.3.2",
+    "rc-slider": "^8.5.0",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0",
+    "three": "^0.88.0",
+    "webpack": "^3.9.1"
+  },
+  "devDependencies": {
+    "awesome-typescript-loader": "^3.4.0",
+    "source-map-loader": "^0.2.3",
+    "typescript": "^2.6.2"
+  }
+}

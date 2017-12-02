@@ -1,0 +1,77 @@
+html, body, #app, .wrapper {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+    line-height: 1.2;
+}
+.wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    flex: 0 0 auto;
+    background: #eee;
+    border-bottom: 1px solid #555;
+    display: flex;
+}
+.header > * {
+    padding: .5rem;
+}
+.header .title {
+    flex: 1 1 auto;
+}
+.header .back {
+    margin-right: .5rem;
+    text-decoration: none;
+    color: black;
+    font-weight: bold;
+}
+
+.menu, .settings, .search {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.menu a, .btn {
+    width: 100%;
+    max-width: 200px;
+    border: 1px solid #555;
+    border-radius: 5px;
+    background: #eee;
+    margin: .25rem;
+    padding: .5rem;
+    bix-sizing: border-box;
+    color: black;
+    text-decoration: none;
+}
+.btn.disabled {
+    background: #ccc;
+    color: #333;
+}
+
+.settings {
+    width: 100%;
+    max-width: 200px;
+    align-self: center;
+}
+.help {
+    width: 100%;
+    align-self: center;
+    flex: 1 1 auto;
+    max-width: 500px;
+}
+.search {
+    border-top: 1px solid black;
+}
+.rc-select {
+    width: 100%;
+}
+.label {
+    margin: .5rem 0 5px;
+    width: 100%;
+}
