@@ -6,27 +6,52 @@ import { MultiPlayer } from './MultiPlayer';
 import { Settings } from './Settings';
 import { Help } from './Help';
 import { Board } from './Board';
+import { Sequence } from '../sequence';
 
 interface AppState {
-    page: Page;
+  page: Page;
+  sound: number;
+  music: number;
 }
 
 export class App extends React.Component<{}, AppState> {
-    state = {
-        page: Page.Home,
-    }
-    switchPage = (page: Page) => () => this.setState({ page });
+  state = {
+    page: Page.Home,
+    sound: 100,
+    music: 100,
+  }
+  switchPage = (page: Page) => () => this.setState({ page });
+  onSoundChange = (sound: number) => this.setState({ sound });
+  onMusicChange = (music: number) => this.setState({ music });
+  sequence: Sequence;
 
-    render() {
-        let widget;
-        switch (this.state.page) {
-            case Page.Home: widget = <Home switchPage={this.switchPage} />; break;
-            case Page.SinglePlayer: widget = <SinglePlayer switchPage={this.switchPage} />; break;
-            case Page.MultiPlayer: widget = <MultiPlayer switchPage={this.switchPage} />; break;
-            case Page.Settings: widget = <Settings switchPage={this.switchPage} />; break;
-            case Page.Help: widget = <Help switchPage={this.switchPage} />; break;
-            case Page.Board: widget = <Board switchPage={this.switchPage} />; break;
-        }
-        return widget;
+  componentWillMount() {
+    this.sequence = new Sequence(new AudioContext(), 120, [
+      'G3 q',
+      'E4 q',
+      'C4 h'
+    ]);
+  }
+  componentWillUpdate() {
+    this.sequence.gain.gain.value = this.state.music;
+  }
+
+  render() {
+    const { switchPage, onSoundChange, onMusicChange } = this;
+    const { sound, music } = this.state;
+    switch (this.state.page) {
+      case Page.Home:
+        return <Home switchPage={this.switchPage} />;
+      case Page.SinglePlayer:
+        return <SinglePlayer {...{ switchPage }} />;
+      case Page.MultiPlayer:
+        return <MultiPlayer {...{ switchPage }} />;
+      case Page.Settings:
+        return <Settings {...{ switchPage, onSoundChange, onMusicChange, music, sound }} />;
+      case Page.Help:
+        return <Help {...{ switchPage }} />;
+      case Page.Board:
+        return <Board {...{ switchPage }} />;
     }
+  }
 }

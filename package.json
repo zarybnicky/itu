@@ -14,6 +14,7 @@
     "@types/react": "^16.0.25",
     "@types/react-dom": "^16.0.3",
     "@types/three": "^0.84.33",
+    "@types/webaudioapi": "0.0.27",
     "rc-select": "^7.3.2",
     "rc-slider": "^8.5.0",
     "react": "^16.2.0",
