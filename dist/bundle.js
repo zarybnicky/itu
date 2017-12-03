@@ -11575,6 +11575,7 @@ exports.MultiPlayer = function (_a) {
             React.createElement("a", { href: "#", onClick: switchPage(types_1.Page.Home), className: "back" }, "<- Back"),
             React.createElement("div", { className: "title" }, "Multiplayer")),
         React.createElement("div", { className: "settings" },
+            React.createElement("input", { type: "text", placeholder: "Room name" }),
             React.createElement("div", { className: "label" }, "Variant"),
             React.createElement(FSlider, { tipFormatter: formatVariant, max: 3 }),
             React.createElement("div", null, "\u00A0"),
