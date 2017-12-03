@@ -20,7 +20,7 @@ export const Settings = (props: SettingsProps) => <div className="wrapper">
     <div className="label">Sound volume</div>
     <FSlider value={props.sound} onChange={props.onSoundChange} />
     <div className="label">Music volume</div>
-    <FSlider value={props.music} onChange={props.onMusicChange} />
+    <FSlider value={props.music} onChange={props.onMusicChange} onAfterChange={props.onMusicChange} />
     <div className="label">Language</div>
     <Select value="english"><Option value="english">English</Option></Select>
   </div>

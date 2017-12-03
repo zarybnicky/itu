@@ -95,7 +95,7 @@ export class Sequence {
   createOscillator() {
     this.stop();
     this.osc = this.ac.createOscillator();
-    this.osc.type = 'square';
+    this.osc.type = 'triangle';
     this.osc.connect(this.gain);
     return this;
   }

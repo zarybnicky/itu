@@ -17,23 +17,53 @@ interface AppState {
 export class App extends React.Component<{}, AppState> {
   state = {
     page: Page.Home,
-    sound: 100,
-    music: 100,
+    sound: 50,
+    music: 50,
   }
   switchPage = (page: Page) => () => this.setState({ page });
   onSoundChange = (sound: number) => this.setState({ sound });
   onMusicChange = (music: number) => this.setState({ music });
   sequence: Sequence;
 
+  //  D E Fis G A B Cis
   componentWillMount() {
-    this.sequence = new Sequence(new AudioContext(), 120, [
-      'G3 q',
-      'E4 q',
-      'C4 h'
+    this.sequence = new Sequence(new AudioContext(), 90, [
+      'D5 e', 'B5 e', 'A5 h',
+      'D5 e', 'B5 e', 'A5 h',
+      'D5 e', 'B5 e', 'A5 q',
+      'B5 q', 'A5 h', '- q',
+      'F#4 q', 'F4 q', 'F#4 q',
+      'C#5 e', 'D5 e',
+      'B4 h', 'D5 h',
+      'D5 q', 'C#5 e', 'B5 e', 'A5 h',
+      'D5 e', 'B5 e', 'A5 h',
+      'D5 e', 'B5 e', 'A5 h',
+      'B5 q', 'A5 h', '- q',
+      'F#4 q', 'F4 q', 'F#4 q',
+      'C#5 e', 'D5 e',
+      'B4 h', 'D5 h',
+      'E5 q', 'D5 2', '- 1',
+      'D5 e', 'B5 e', 'A5 h',
+      'D5 e', 'B5 e', 'A5 h',
+      'D5 e', 'B5 e', 'A5 q',
+      'B5 q', 'A5 h', '- q',
+      'F#4 q', 'F4 q', 'F#4 q',
+      'C#5 e', 'D5 e',
+      'B4 h', 'D5 h',
+      'D5 q', 'C#5 e', 'B5 e', 'A5 h',
+      'D5 e', 'B5 e', 'A5 h',
+      'D5 e', 'B5 e', 'A5 h',
+      'B5 q', 'A5 h', '- q',
+      'F#4 q', 'F4 q', 'F#4 q',
+      'C#5 e', 'D5 e',
+      'B4 h', 'D5 h',
+      'E5 q', 'D5 2', '- 5',
     ]);
+    this.sequence.gain.gain.value = this.state.music / 100;
+    this.sequence.play();
   }
   componentWillUpdate() {
-    this.sequence.gain.gain.value = this.state.music;
+    this.sequence.gain.gain.value = this.state.music / 100;
   }
 
   render() {

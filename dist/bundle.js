@@ -5492,6 +5492,14 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+var __assign = (this && this.__assign) || Object.assign || function(t) {
+    for (var s, i = 1, n = arguments.length; i < n; i++) {
+        s = arguments[i];
+        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+            t[p] = s[p];
+    }
+    return t;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 var React = __webpack_require__(0);
 var types_1 = __webpack_require__(11);
@@ -5501,39 +5509,78 @@ var MultiPlayer_1 = __webpack_require__(165);
 var Settings_1 = __webpack_require__(166);
 var Help_1 = __webpack_require__(184);
 var Board_1 = __webpack_require__(185);
+var sequence_1 = __webpack_require__(189);
 var App = /** @class */ (function (_super) {
     __extends(App, _super);
     function App() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.state = {
             page: types_1.Page.Home,
+            sound: 50,
+            music: 50,
         };
         _this.switchPage = function (page) { return function () { return _this.setState({ page: page }); }; };
+        _this.onSoundChange = function (sound) { return _this.setState({ sound: sound }); };
+        _this.onMusicChange = function (music) { return _this.setState({ music: music }); };
         return _this;
     }
+    //  D E Fis G A B Cis
+    App.prototype.componentWillMount = function () {
+        this.sequence = new sequence_1.Sequence(new AudioContext(), 90, [
+            'D5 e', 'B5 e', 'A5 h',
+            'D5 e', 'B5 e', 'A5 h',
+            'D5 e', 'B5 e', 'A5 q',
+            'B5 q', 'A5 h', '- q',
+            'F#4 q', 'F4 q', 'F#4 q',
+            'C#5 e', 'D5 e',
+            'B4 h', 'D5 h',
+            'D5 q', 'C#5 e', 'B5 e', 'A5 h',
+            'D5 e', 'B5 e', 'A5 h',
+            'D5 e', 'B5 e', 'A5 h',
+            'B5 q', 'A5 h', '- q',
+            'F#4 q', 'F4 q', 'F#4 q',
+            'C#5 e', 'D5 e',
+            'B4 h', 'D5 h',
+            'E5 q', 'D5 2', '- 1',
+            'D5 e', 'B5 e', 'A5 h',
+            'D5 e', 'B5 e', 'A5 h',
+            'D5 e', 'B5 e', 'A5 q',
+            'B5 q', 'A5 h', '- q',
+            'F#4 q', 'F4 q', 'F#4 q',
+            'C#5 e', 'D5 e',
+            'B4 h', 'D5 h',
+            'D5 q', 'C#5 e', 'B5 e', 'A5 h',
+            'D5 e', 'B5 e', 'A5 h',
+            'D5 e', 'B5 e', 'A5 h',
+            'B5 q', 'A5 h', '- q',
+            'F#4 q', 'F4 q', 'F#4 q',
+            'C#5 e', 'D5 e',
+            'B4 h', 'D5 h',
+            'E5 q', 'D5 2', '- 5',
+        ]);
+        this.sequence.gain.gain.value = this.state.music / 100;
+        this.sequence.play();
+    };
+    App.prototype.componentWillUpdate = function () {
+        this.sequence.gain.gain.value = this.state.music / 100;
+    };
     App.prototype.render = function () {
-        var widget;
+        var _a = this, switchPage = _a.switchPage, onSoundChange = _a.onSoundChange, onMusicChange = _a.onMusicChange;
+        var _b = this.state, sound = _b.sound, music = _b.music;
         switch (this.state.page) {
             case types_1.Page.Home:
-                widget = React.createElement(Home_1.Home, { switchPage: this.switchPage });
-                break;
+                return React.createElement(Home_1.Home, { switchPage: this.switchPage });
             case types_1.Page.SinglePlayer:
-                widget = React.createElement(SinglePlayer_1.SinglePlayer, { switchPage: this.switchPage });
-                break;
+                return React.createElement(SinglePlayer_1.SinglePlayer, __assign({}, { switchPage: switchPage }));
             case types_1.Page.MultiPlayer:
-                widget = React.createElement(MultiPlayer_1.MultiPlayer, { switchPage: this.switchPage });
-                break;
+                return React.createElement(MultiPlayer_1.MultiPlayer, __assign({}, { switchPage: switchPage }));
             case types_1.Page.Settings:
-                widget = React.createElement(Settings_1.Settings, { switchPage: this.switchPage });
-                break;
+                return React.createElement(Settings_1.Settings, __assign({}, { switchPage: switchPage, onSoundChange: onSoundChange, onMusicChange: onMusicChange, music: music, sound: sound }));
             case types_1.Page.Help:
-                widget = React.createElement(Help_1.Help, { switchPage: this.switchPage });
-                break;
+                return React.createElement(Help_1.Help, __assign({}, { switchPage: switchPage }));
             case types_1.Page.Board:
-                widget = React.createElement(Board_1.Board, { switchPage: this.switchPage });
-                break;
+                return React.createElement(Board_1.Board, __assign({}, { switchPage: switchPage }));
         }
-        return widget;
     };
     return App;
 }(React.Component));
@@ -11601,21 +11648,18 @@ var types_1 = __webpack_require__(11);
 var rc_slider_1 = __webpack_require__(34);
 var rc_select_1 = __webpack_require__(167);
 var FSlider = rc_slider_1.createSliderWithTooltip(rc_slider_1.default);
-exports.Settings = function (_a) {
-    var switchPage = _a.switchPage;
-    return React.createElement("div", { className: "wrapper" },
-        React.createElement("div", { className: "header" },
-            React.createElement("a", { href: "#", onClick: switchPage(types_1.Page.Home), className: "back" }, "<- Back"),
-            React.createElement("div", { className: "title" }, "Settings")),
-        React.createElement("div", { className: "settings" },
-            React.createElement("div", { className: "label" }, "Sound volume"),
-            React.createElement(FSlider, null),
-            React.createElement("div", { className: "label" }, "Music volume"),
-            React.createElement(FSlider, null),
-            React.createElement("div", { className: "label" }, "Language"),
-            React.createElement(rc_select_1.default, { value: "english" },
-                React.createElement(rc_select_1.Option, { value: "english" }, "English"))));
-};
+exports.Settings = function (props) { return React.createElement("div", { className: "wrapper" },
+    React.createElement("div", { className: "header" },
+        React.createElement("a", { href: "#", onClick: props.switchPage(types_1.Page.Home), className: "back" }, "<- Back"),
+        React.createElement("div", { className: "title" }, "Settings")),
+    React.createElement("div", { className: "settings" },
+        React.createElement("div", { className: "label" }, "Sound volume"),
+        React.createElement(FSlider, { value: props.sound, onChange: props.onSoundChange }),
+        React.createElement("div", { className: "label" }, "Music volume"),
+        React.createElement(FSlider, { value: props.music, onChange: props.onMusicChange, onAfterChange: props.onMusicChange }),
+        React.createElement("div", { className: "label" }, "Language"),
+        React.createElement(rc_select_1.default, { value: "english" },
+            React.createElement(rc_select_1.Option, { value: "english" }, "English")))); };
 
 
 /***/ }),
@@ -17138,6 +17182,170 @@ THREE.OBJLoader = ( function () {
 	return OBJLoader;
 
 } )();
+
+
+/***/ }),
+/* 189 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var note_1 = __webpack_require__(190);
+var Sequence = /** @class */ (function () {
+    function Sequence(ac, tempo, arr) {
+        this.loop = true;
+        this.smoothing = 0;
+        this.staccato = 0;
+        this.notes = [];
+        this.ac = ac;
+        this.createFxNodes();
+        this.tempo = tempo;
+        this.push.apply(this, arr || []);
+    }
+    Sequence.prototype.createFxNodes = function () {
+        this.gain = this.ac.createGain();
+        this.bass = this.ac.createBiquadFilter();
+        this.bass.type = 'peaking';
+        this.bass.frequency.value = 100;
+        this.gain.connect(this.bass);
+        this.mid = this.ac.createBiquadFilter();
+        this.mid.type = 'peaking';
+        this.mid.frequency.value = 1000;
+        this.bass.connect(this.mid);
+        this.treble = this.ac.createBiquadFilter();
+        this.treble.type = 'peaking';
+        this.treble.frequency.value = 2500;
+        this.mid.connect(this.treble);
+        this.treble.connect(this.ac.destination);
+        return this;
+    };
+    Sequence.prototype.push = function () {
+        var _this = this;
+        var notes = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            notes[_i] = arguments[_i];
+        }
+        notes.forEach(function (note) {
+            _this.notes.push(note instanceof note_1.Note ? note : new note_1.Note(note));
+        });
+        return this;
+    };
+    // get the next note
+    Sequence.prototype.getNextNote = function (index) {
+        return this.notes[index < this.notes.length - 1 ? index + 1 : 0];
+    };
+    ;
+    Sequence.prototype.scheduleNote = function (index, when) {
+        var duration = 60 / this.tempo * this.notes[index].duration;
+        var cutoff = duration * (1 - (this.staccato || 0));
+        this.setFrequency(this.notes[index].frequency, when);
+        if (this.smoothing && this.notes[index].frequency) {
+            this.slide(index, when, cutoff);
+        }
+        this.setFrequency(0, when + cutoff);
+        return when + duration;
+    };
+    ;
+    // set frequency at time
+    Sequence.prototype.setFrequency = function (freq, when) {
+        this.osc.frequency.setValueAtTime(freq, when);
+        return this;
+    };
+    ;
+    // ramp to frequency at time
+    Sequence.prototype.rampFrequency = function (freq, when) {
+        this.osc.frequency.linearRampToValueAtTime(freq, when);
+        return this;
+    };
+    ;
+    Sequence.prototype.slide = function (index, when, cutoff) {
+        var next = this.getNextNote(index);
+        var start = this.getSlideStartDelay(cutoff);
+        this.setFrequency(this.notes[index].frequency, when + start);
+        this.rampFrequency(next.frequency, when + cutoff);
+        return this;
+    };
+    Sequence.prototype.getSlideStartDelay = function (duration) {
+        return duration - Math.min(duration, 60 / this.tempo * this.smoothing);
+    };
+    ;
+    Sequence.prototype.createOscillator = function () {
+        this.stop();
+        this.osc = this.ac.createOscillator();
+        this.osc.type = 'triangle';
+        this.osc.connect(this.gain);
+        return this;
+    };
+    Sequence.prototype.stop = function () {
+        if (this.osc) {
+            this.osc.onended = null;
+            this.osc.disconnect();
+            this.osc = null;
+        }
+        return this;
+    };
+    Sequence.prototype.play = function (when) {
+        var _this = this;
+        when = typeof when === 'number' ? when : this.ac.currentTime;
+        this.createOscillator();
+        this.osc.start(when);
+        this.notes.forEach(function (note, i) {
+            when = _this.scheduleNote(i, when);
+        });
+        this.osc.stop(when);
+        this.osc.onended = this.loop ? this.play.bind(this, when) : null;
+        return this;
+    };
+    ;
+    return Sequence;
+}());
+exports.Sequence = Sequence;
+
+
+/***/ }),
+/* 190 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var enharmonics = 'B#-C|C#-Db|D|D#-Eb|E-Fb|E#-F|F#-Gb|G|G#-Ab|A|A#-Bb|B-Cb';
+var middleC = 440 * Math.pow(Math.pow(2, 1 / 12), -9);
+var numeric = /^[0-9.]+$/;
+var octaveOffset = 4;
+var space = /\s+/;
+var num = /(\d+)/;
+var offsets = {};
+enharmonics.split('|').forEach(function (val, i) {
+    val.split('-').forEach(function (note) {
+        offsets[note] = i;
+    });
+});
+var Note = /** @class */ (function () {
+    function Note(str) {
+        var couple = str.split(space);
+        this.frequency = Note.getFrequency(couple[0]) || 0;
+        this.duration = Note.getDuration(couple[1]) || 0;
+    }
+    Note.getFrequency = function (name) {
+        var couple = name.split(num);
+        var distance = offsets[couple[0]];
+        var octaveDiff = (parseInt(couple[1]) || octaveOffset) - octaveOffset;
+        var freq = middleC * Math.pow(Math.pow(2, 1 / 12), distance);
+        return freq * Math.pow(2, octaveDiff);
+    };
+    Note.getDuration = function (symbol) {
+        return numeric.test(symbol) ? parseFloat(symbol) :
+            symbol.toLowerCase().split('').reduce(function (prev, curr) {
+                return prev + (curr === 'w' ? 4 : curr === 'h' ? 2 :
+                    curr === 'q' ? 1 : curr === 'e' ? 0.5 :
+                        curr === 's' ? 0.25 : 0);
+            }, 0);
+    };
+    return Note;
+}());
+exports.Note = Note;
 
 
 /***/ })
