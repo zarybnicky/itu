@@ -13,7 +13,9 @@ interface SettingsProps {
 const FSlider = createSliderWithTooltip(Slider);
 export const Settings = (props: SettingsProps) => <div className="wrapper">
   <div className="header">
-    <a href="#" onClick={props.switchPage(Page.Home)} className="back">&lt;- Back</a>
+    <a href="#" onClick={props.switchPage(Page.Home)} className="back">
+      <img src="left.png" height="12" /> Back
+    </a>
     <div className="title">Settings</div>
   </div>
   <div className="settings">

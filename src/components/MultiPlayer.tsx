@@ -9,7 +9,9 @@ interface MultiPlayerProps {
 const FSlider = createSliderWithTooltip(Slider);
 export const MultiPlayer = ({ switchPage }: MultiPlayerProps) => <div className="wrapper">
   <div className="header">
-    <a href="#" onClick={switchPage(Page.Home)} className="back">&lt;- Back</a>
+    <a href="#" onClick={switchPage(Page.Home)} className="back">
+      <img src="left.png" height="12" /> Back
+    </a>
     <div className="title">Multiplayer</div>
   </div>
   <div className="settings">

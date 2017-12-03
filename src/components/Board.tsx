@@ -636,7 +636,7 @@ export class Board extends React.Component<BoardProps, {}> {
       // enable animation loop when using damping or autorotation
       controlsOrbit.enableDamping = true;
       controlsOrbit.dampingFactor = 0.25;
-
+      controlsOrbit.rotateSpeed = 0.4;
 
       var mtlLoader = new THREE.MTLLoader();
       mtlLoader.load('board.mtl', function(materials) {
@@ -694,7 +694,9 @@ export class Board extends React.Component<BoardProps, {}> {
     const { switchPage } = this.props;
     return <div className="wrapper">
       <div className="header">
-        <a href="#" onClick={switchPage(Page.Home)} className="back">&lt;- Back</a>
+        <a href="#" onClick={switchPage(Page.Home)} className="back">
+          <img src="left.png" height="12" /> Back
+        </a>
         <div className="title"></div>
         <div><img src="left.png" height="12" /></div>
         <div><img src="right.png" height="12" /></div>
