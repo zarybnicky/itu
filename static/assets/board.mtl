@@ -9,7 +9,7 @@ Ks 1.000000 1.000000 1.000000
 Ni 1.000000
 d 1.000000
 illum 0
-map_Kd marble_texture1802.jpg
+map_Kd assets/marble_texture1802.jpg
 
 newmtl Material.002
 Ns 96.078431
@@ -19,7 +19,7 @@ Ks 1.000000 1.000000 1.000000
 Ni 1.000000
 d 1.000000
 illum 0
-map_Kd Seamless marble texture (12).jpg
+map_Kd assets/Seamless marble texture (12).jpg
 
 newmtl Material
 Ns 96.078431
@@ -29,4 +29,4 @@ Ks 1.000000 1.000000 1.000000
 Ni 1.000000
 d 1.000000
 illum 0
-map_Kd Wood-Texture-Background.jpg
+map_Kd assets/Wood-Texture-Background.jpg

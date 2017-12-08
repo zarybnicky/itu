@@ -14,7 +14,7 @@ const FSlider = createSliderWithTooltip(Slider);
 export const Settings = (props: SettingsProps) => <div className="wrapper">
   <div className="header">
     <a href="#" onClick={props.switchPage(Page.Home)} className="back">
-      <img src="left.png" height="12" /> Back
+      <img src="assets/left.png" height="12" /> Back
     </a>
     <div className="title">Settings</div>
   </div>

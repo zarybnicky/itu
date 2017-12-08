@@ -639,11 +639,11 @@ export class Board extends React.Component<BoardProps, {}> {
       controlsOrbit.rotateSpeed = 0.4;
 
       var mtlLoader = new THREE.MTLLoader();
-      mtlLoader.load('board.mtl', function(materials) {
+      mtlLoader.load('assets/board.mtl', function(materials) {
         materials.preload();
         var objLoader = new THREE.OBJLoader();
         objLoader.setMaterials(materials);
-        objLoader.load('board.obj', function(object) {
+        objLoader.load('assets/board.obj', function(object) {
           object.scale.x = 1;
           object.scale.y = 1;
           object.scale.z = 1;
@@ -695,11 +695,11 @@ export class Board extends React.Component<BoardProps, {}> {
     return <div className="wrapper">
       <div className="header">
         <a href="#" onClick={switchPage(Page.Home)} className="back">
-          <img src="left.png" height="12" /> Back
+          <img src="assets/left.png" height="12" /> Back
         </a>
         <div className="title"></div>
-        <div><img src="left.png" height="12" /></div>
-        <div><img src="right.png" height="12" /></div>
+        <div><img src="assets/left.png" height="12" /></div>
+        <div><img src="assets/right.png" height="12" /></div>
         <div><b>Menu</b></div>
       </div>
       <div id="container"></div>

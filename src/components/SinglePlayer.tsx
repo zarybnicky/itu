@@ -10,7 +10,7 @@ const FSlider = createSliderWithTooltip(Slider);
 export const SinglePlayer = ({ switchPage }: SinglePlayerProps) => <div className="wrapper">
   <div className="header">
     <a href="#" onClick={switchPage(Page.Home)} className="back">
-      <img src="left.png" height="12" /> Back
+      <img src="assets/left.png" height="12" /> Back
     </a>
     <div className="title">Singleplayer</div>
   </div>

@@ -10,7 +10,7 @@ const FSlider = createSliderWithTooltip(Slider);
 export const MultiPlayer = ({ switchPage }: MultiPlayerProps) => <div className="wrapper">
   <div className="header">
     <a href="#" onClick={switchPage(Page.Home)} className="back">
-      <img src="left.png" height="12" /> Back
+      <img src="assets/left.png" height="12" /> Back
     </a>
     <div className="title">Multiplayer</div>
   </div>
@@ -22,7 +22,7 @@ export const MultiPlayer = ({ switchPage }: MultiPlayerProps) => <div className=
     <RoomBtn />
   </div>
   <div className="search">
-    <img alt="searching..." width="75" src="search.png" />
+    <img alt="searching..." width="75" src="assets/search.png" />
     <Searching />
   </div>
 </div>;
