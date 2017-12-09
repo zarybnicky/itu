@@ -18,7 +18,7 @@ export const SinglePlayer = ({ switchPage }: SinglePlayerProps) => <div classNam
     <div className="label">Difficulty</div>
     <FSlider tipFormatter={formatDifficulty} max={2} />
     <div className="label">Variant</div>
-    <FSlider tipFormatter={formatVariant} max={3} />
+    <FSlider tipFormatter={formatVariant} max={2} />
     <a className="btn" href="#" onClick={switchPage(Page.Board)}>Play</a>
   </div>
 </div>;
@@ -34,7 +34,6 @@ const formatVariant = (n: number) => {
   switch (n) {
     case 0: return '3x3';
     case 1: return '9x9';
-    case 2: return '18x18';
-    default: return '36x35';
+    default: return '27x27';
   }
 }

@@ -5476,9 +5476,9 @@ module.exports = THREE;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var React = __webpack_require__(0);
-var ReactDOM = __webpack_require__(6);
-var App_1 = __webpack_require__(86);
+const React = __webpack_require__(0);
+const ReactDOM = __webpack_require__(6);
+const App_1 = __webpack_require__(86);
 ReactDOM.render(React.createElement(App_1.App, null), document.getElementById("app"));
 
 
@@ -5488,50 +5488,30 @@ ReactDOM.render(React.createElement(App_1.App, null), document.getElementById("a
 
 "use strict";
 
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __assign = (this && this.__assign) || Object.assign || function(t) {
-    for (var s, i = 1, n = arguments.length; i < n; i++) {
-        s = arguments[i];
-        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-            t[p] = s[p];
-    }
-    return t;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-var React = __webpack_require__(0);
-var types_1 = __webpack_require__(11);
-var Home_1 = __webpack_require__(87);
-var SinglePlayer_1 = __webpack_require__(88);
-var MultiPlayer_1 = __webpack_require__(166);
-var Settings_1 = __webpack_require__(167);
-var Help_1 = __webpack_require__(185);
-var Board_1 = __webpack_require__(186);
-var sequence_1 = __webpack_require__(190);
-var App = /** @class */ (function (_super) {
-    __extends(App, _super);
-    function App() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.state = {
+const React = __webpack_require__(0);
+const types_1 = __webpack_require__(11);
+const Home_1 = __webpack_require__(87);
+const SinglePlayer_1 = __webpack_require__(88);
+const MultiPlayer_1 = __webpack_require__(166);
+const Settings_1 = __webpack_require__(167);
+const Help_1 = __webpack_require__(185);
+const Board_1 = __webpack_require__(186);
+const sequence_1 = __webpack_require__(190);
+class App extends React.Component {
+    constructor() {
+        super(...arguments);
+        this.state = {
             page: types_1.Page.Home,
             sound: 50,
             music: 50,
         };
-        _this.switchPage = function (page) { return function () { return _this.setState({ page: page }); }; };
-        _this.onSoundChange = function (sound) { return _this.setState({ sound: sound }); };
-        _this.onMusicChange = function (music) { return _this.setState({ music: music }); };
-        return _this;
+        this.switchPage = (page) => () => this.setState({ page });
+        this.onSoundChange = (sound) => this.setState({ sound });
+        this.onMusicChange = (music) => this.setState({ music });
     }
     //  D E Fis G A B Cis
-    App.prototype.componentWillMount = function () {
+    componentWillMount() {
         this.sequence = new sequence_1.Sequence(new AudioContext(), 90, [
             'D5 e', 'B5 e', 'A5 h',
             'D5 e', 'B5 e', 'A5 h',
@@ -5566,30 +5546,29 @@ var App = /** @class */ (function (_super) {
         ]);
         this.sequence.gain.gain.value = this.state.music / 100;
         this.sequence.play();
-    };
-    App.prototype.componentWillUpdate = function () {
+    }
+    componentWillUpdate() {
         this.sequence.gain.gain.value = this.state.music / 100;
-    };
-    App.prototype.render = function () {
-        var _a = this, switchPage = _a.switchPage, onSoundChange = _a.onSoundChange, onMusicChange = _a.onMusicChange;
-        var _b = this.state, sound = _b.sound, music = _b.music;
+    }
+    render() {
+        const { switchPage, onSoundChange, onMusicChange } = this;
+        const { sound, music } = this.state;
         switch (this.state.page) {
             case types_1.Page.Home:
                 return React.createElement(Home_1.Home, { switchPage: this.switchPage });
             case types_1.Page.SinglePlayer:
-                return React.createElement(SinglePlayer_1.SinglePlayer, __assign({}, { switchPage: switchPage }));
+                return React.createElement(SinglePlayer_1.SinglePlayer, Object.assign({}, { switchPage }));
             case types_1.Page.MultiPlayer:
-                return React.createElement(MultiPlayer_1.MultiPlayer, __assign({}, { switchPage: switchPage }));
+                return React.createElement(MultiPlayer_1.MultiPlayer, Object.assign({}, { switchPage }));
             case types_1.Page.Settings:
-                return React.createElement(Settings_1.Settings, __assign({}, { switchPage: switchPage, onSoundChange: onSoundChange, onMusicChange: onMusicChange, music: music, sound: sound }));
+                return React.createElement(Settings_1.Settings, Object.assign({}, { switchPage, onSoundChange, onMusicChange, music, sound }));
             case types_1.Page.Help:
-                return React.createElement(Help_1.Help, __assign({}, { switchPage: switchPage }));
+                return React.createElement(Help_1.Help, Object.assign({}, { switchPage }));
             case types_1.Page.Board:
-                return React.createElement(Board_1.Board, __assign({}, { switchPage: switchPage }));
+                return React.createElement(Board_1.Board, Object.assign({}, { switchPage }));
         }
-    };
-    return App;
-}(React.Component));
+    }
+}
 exports.App = App;
 
 
@@ -5600,19 +5579,16 @@ exports.App = App;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var React = __webpack_require__(0);
-var types_1 = __webpack_require__(11);
-exports.Home = function (_a) {
-    var switchPage = _a.switchPage;
-    return React.createElement("div", { className: "wrapper" },
-        React.createElement("div", { className: "header" },
-            React.createElement("div", { className: "title" }, "3D Gomoku")),
-        React.createElement("div", { className: "menu" },
-            React.createElement("a", { href: "#", onClick: switchPage(types_1.Page.SinglePlayer) }, "Single player"),
-            React.createElement("a", { href: "#", onClick: switchPage(types_1.Page.MultiPlayer) }, "Multi player"),
-            React.createElement("a", { href: "#", onClick: switchPage(types_1.Page.Settings) }, "Settings"),
-            React.createElement("a", { href: "#", onClick: switchPage(types_1.Page.Help) }, "Help")));
-};
+const React = __webpack_require__(0);
+const types_1 = __webpack_require__(11);
+exports.Home = ({ switchPage }) => React.createElement("div", { className: "wrapper" },
+    React.createElement("div", { className: "header" },
+        React.createElement("div", { className: "title" }, "3D Gomoku")),
+    React.createElement("div", { className: "menu" },
+        React.createElement("a", { href: "#", onClick: switchPage(types_1.Page.SinglePlayer) }, "Single player"),
+        React.createElement("a", { href: "#", onClick: switchPage(types_1.Page.MultiPlayer) }, "Multi player"),
+        React.createElement("a", { href: "#", onClick: switchPage(types_1.Page.Settings) }, "Settings"),
+        React.createElement("a", { href: "#", onClick: switchPage(types_1.Page.Help) }, "Help")));
 
 
 /***/ }),
@@ -5622,38 +5598,34 @@ exports.Home = function (_a) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var React = __webpack_require__(0);
-var types_1 = __webpack_require__(11);
-var rc_slider_1 = __webpack_require__(34);
-var FSlider = rc_slider_1.createSliderWithTooltip(rc_slider_1.default);
-exports.SinglePlayer = function (_a) {
-    var switchPage = _a.switchPage;
-    return React.createElement("div", { className: "wrapper" },
-        React.createElement("div", { className: "header" },
-            React.createElement("a", { href: "#", onClick: switchPage(types_1.Page.Home), className: "back" },
-                React.createElement("img", { src: "assets/left.png", height: "12" }),
-                " Back"),
-            React.createElement("div", { className: "title" }, "Singleplayer")),
-        React.createElement("div", { className: "settings" },
-            React.createElement("div", { className: "label" }, "Difficulty"),
-            React.createElement(FSlider, { tipFormatter: formatDifficulty, max: 2 }),
-            React.createElement("div", { className: "label" }, "Variant"),
-            React.createElement(FSlider, { tipFormatter: formatVariant, max: 3 }),
-            React.createElement("a", { className: "btn", href: "#", onClick: switchPage(types_1.Page.Board) }, "Play")));
-};
-var formatDifficulty = function (n) {
+const React = __webpack_require__(0);
+const types_1 = __webpack_require__(11);
+const rc_slider_1 = __webpack_require__(34);
+const FSlider = rc_slider_1.createSliderWithTooltip(rc_slider_1.default);
+exports.SinglePlayer = ({ switchPage }) => React.createElement("div", { className: "wrapper" },
+    React.createElement("div", { className: "header" },
+        React.createElement("a", { href: "#", onClick: switchPage(types_1.Page.Home), className: "back" },
+            React.createElement("img", { src: "assets/left.png", height: "12" }),
+            " Back"),
+        React.createElement("div", { className: "title" }, "Singleplayer")),
+    React.createElement("div", { className: "settings" },
+        React.createElement("div", { className: "label" }, "Difficulty"),
+        React.createElement(FSlider, { tipFormatter: formatDifficulty, max: 2 }),
+        React.createElement("div", { className: "label" }, "Variant"),
+        React.createElement(FSlider, { tipFormatter: formatVariant, max: 2 }),
+        React.createElement("a", { className: "btn", href: "#", onClick: switchPage(types_1.Page.Board) }, "Play")));
+const formatDifficulty = (n) => {
     switch (n) {
         case 0: return 'Easy';
         case 1: return 'Medium';
         default: return 'Hard';
     }
 };
-var formatVariant = function (n) {
+const formatVariant = (n) => {
     switch (n) {
         case 0: return '3x3';
         case 1: return '9x9';
-        case 2: return '18x18';
-        default: return '36x35';
+        default: return '27x27';
     }
 };
 
@@ -11561,47 +11533,34 @@ var placements = {
 
 "use strict";
 
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 Object.defineProperty(exports, "__esModule", { value: true });
-var React = __webpack_require__(0);
-var types_1 = __webpack_require__(11);
-var rc_slider_1 = __webpack_require__(34);
-var FSlider = rc_slider_1.createSliderWithTooltip(rc_slider_1.default);
-exports.MultiPlayer = function (_a) {
-    var switchPage = _a.switchPage;
-    return React.createElement("div", { className: "wrapper" },
-        React.createElement("div", { className: "header" },
-            React.createElement("a", { href: "#", onClick: switchPage(types_1.Page.Home), className: "back" },
-                React.createElement("img", { src: "assets/left.png", height: "12" }),
-                " Back"),
-            React.createElement("div", { className: "title" }, "Multiplayer")),
-        React.createElement("div", { className: "settings" },
-            React.createElement("input", { type: "text", placeholder: "Room name" }),
-            React.createElement("div", { className: "label" }, "Variant"),
-            React.createElement(FSlider, { tipFormatter: formatVariant, max: 3 }),
-            React.createElement("div", null, "\u00A0"),
-            React.createElement(RoomBtn, null)),
-        React.createElement("div", { className: "search" },
-            React.createElement("img", { alt: "searching...", width: "75", src: "assets/search.png" }),
-            React.createElement(Searching, null)));
-};
-var formatDifficulty = function (n) {
+const React = __webpack_require__(0);
+const types_1 = __webpack_require__(11);
+const rc_slider_1 = __webpack_require__(34);
+const FSlider = rc_slider_1.createSliderWithTooltip(rc_slider_1.default);
+exports.MultiPlayer = ({ switchPage }) => React.createElement("div", { className: "wrapper" },
+    React.createElement("div", { className: "header" },
+        React.createElement("a", { href: "#", onClick: switchPage(types_1.Page.Home), className: "back" },
+            React.createElement("img", { src: "assets/left.png", height: "12" }),
+            " Back"),
+        React.createElement("div", { className: "title" }, "Multiplayer")),
+    React.createElement("div", { className: "settings" },
+        React.createElement("input", { type: "text", placeholder: "Room name" }),
+        React.createElement("div", { className: "label" }, "Variant"),
+        React.createElement(FSlider, { tipFormatter: formatVariant, max: 3 }),
+        React.createElement("div", null, "\u00A0"),
+        React.createElement(RoomBtn, null)),
+    React.createElement("div", { className: "search" },
+        React.createElement("img", { alt: "searching...", width: "75", src: "assets/search.png" }),
+        React.createElement(Searching, null)));
+const formatDifficulty = (n) => {
     switch (n) {
         case 0: return 'Easy';
         case 1: return 'Medium';
         default: return 'Hard';
     }
 };
-var formatVariant = function (n) {
+const formatVariant = (n) => {
     switch (n) {
         case 0: return '3x3';
         case 1: return '9x9';
@@ -11609,42 +11568,35 @@ var formatVariant = function (n) {
         default: return '36x35';
     }
 };
-var RoomBtn = /** @class */ (function (_super) {
-    __extends(RoomBtn, _super);
-    function RoomBtn() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.state = { x: false };
-        _this.f = function () { return _this.setState({ x: true }); };
-        return _this;
+class RoomBtn extends React.Component {
+    constructor() {
+        super(...arguments);
+        this.state = { x: false };
+        this.f = () => this.setState({ x: true });
     }
-    RoomBtn.prototype.render = function () {
-        return React.createElement("a", { className: "btn " + (this.state.x && 'disabled'), href: "#", onClick: this.f }, "Create room");
-    };
-    return RoomBtn;
-}(React.Component));
-var Searching = /** @class */ (function (_super) {
-    __extends(Searching, _super);
-    function Searching() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.state = { n: 1 };
-        return _this;
+    render() {
+        return React.createElement("a", { className: `btn ${this.state.x && 'disabled'}`, href: "#", onClick: this.f }, "Create room");
     }
-    Searching.prototype.componentDidMount = function () {
-        var _this = this;
-        this.timer = setInterval(function () { return _this.setState({
-            n: (_this.state.n + 1) % 3,
-        }); }, 500);
-    };
-    Searching.prototype.componentWillUnmount = function () {
+}
+class Searching extends React.Component {
+    constructor() {
+        super(...arguments);
+        this.state = { n: 1 };
+    }
+    componentDidMount() {
+        this.timer = setInterval(() => this.setState({
+            n: (this.state.n + 1) % 3,
+        }), 500);
+    }
+    componentWillUnmount() {
         if (this.timer) {
             clearInterval(this.timer);
         }
-    };
-    Searching.prototype.render = function () {
-        return "Searching" + new Array(this.state.n + 2).join('.');
-    };
-    return Searching;
-}(React.Component));
+    }
+    render() {
+        return `Searching${new Array(this.state.n + 2).join('.')}`;
+    }
+}
 
 
 /***/ }),
@@ -11654,12 +11606,12 @@ var Searching = /** @class */ (function (_super) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var React = __webpack_require__(0);
-var types_1 = __webpack_require__(11);
-var rc_slider_1 = __webpack_require__(34);
-var rc_select_1 = __webpack_require__(168);
-var FSlider = rc_slider_1.createSliderWithTooltip(rc_slider_1.default);
-exports.Settings = function (props) { return React.createElement("div", { className: "wrapper" },
+const React = __webpack_require__(0);
+const types_1 = __webpack_require__(11);
+const rc_slider_1 = __webpack_require__(34);
+const rc_select_1 = __webpack_require__(168);
+const FSlider = rc_slider_1.createSliderWithTooltip(rc_slider_1.default);
+exports.Settings = (props) => React.createElement("div", { className: "wrapper" },
     React.createElement("div", { className: "header" },
         React.createElement("a", { href: "#", onClick: props.switchPage(types_1.Page.Home), className: "back" },
             React.createElement("img", { src: "assets/left.png", height: "12" }),
@@ -11672,7 +11624,7 @@ exports.Settings = function (props) { return React.createElement("div", { classN
         React.createElement(FSlider, { value: props.music, onChange: props.onMusicChange, onAfterChange: props.onMusicChange }),
         React.createElement("div", { className: "label" }, "Language"),
         React.createElement(rc_select_1.default, { value: "english" },
-            React.createElement(rc_select_1.Option, { value: "english" }, "English")))); };
+            React.createElement(rc_select_1.Option, { value: "english" }, "English"))));
 
 
 /***/ }),
@@ -15269,22 +15221,19 @@ OptGroup.isSelectOptGroup = true;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var React = __webpack_require__(0);
-var types_1 = __webpack_require__(11);
-exports.Help = function (_a) {
-    var switchPage = _a.switchPage;
-    return React.createElement("div", { className: "wrapper" },
-        React.createElement("div", { className: "header" },
-            React.createElement("a", { href: "#", onClick: switchPage(types_1.Page.Home), className: "back" },
-                React.createElement("img", { src: "assets/left.png", height: "12" }),
-                " Back"),
-            React.createElement("div", { className: "title" }, "Help")),
-        React.createElement("div", { className: "help" },
-            React.createElement("p", null, "Long text explaining Gomoku. Long text explaining Gomoku. Long text explaining Gomoku. Long text explaining Gomoku. "),
-            React.createElement("p", null, "Long text explaining Gomoku. Long text explaining Gomoku. Long text explaining Gomoku. Long text explaining Gomoku. "),
-            React.createElement("p", null, "Long text explaining Gomoku. Long text explaining Gomoku. Long text explaining Gomoku. Long text explaining Gomoku. "),
-            React.createElement("p", null, "Long text explaining Gomoku. Long text explaining Gomoku. Long text explaining Gomoku. Long text explaining Gomoku. ")));
-};
+const React = __webpack_require__(0);
+const types_1 = __webpack_require__(11);
+exports.Help = ({ switchPage }) => React.createElement("div", { className: "wrapper" },
+    React.createElement("div", { className: "header" },
+        React.createElement("a", { href: "#", onClick: switchPage(types_1.Page.Home), className: "back" },
+            React.createElement("img", { src: "assets/left.png", height: "12" }),
+            " Back"),
+        React.createElement("div", { className: "title" }, "Help")),
+    React.createElement("div", { className: "help" },
+        React.createElement("p", null, "Long text explaining Gomoku. Long text explaining Gomoku. Long text explaining Gomoku. Long text explaining Gomoku. "),
+        React.createElement("p", null, "Long text explaining Gomoku. Long text explaining Gomoku. Long text explaining Gomoku. Long text explaining Gomoku. "),
+        React.createElement("p", null, "Long text explaining Gomoku. Long text explaining Gomoku. Long text explaining Gomoku. Long text explaining Gomoku. "),
+        React.createElement("p", null, "Long text explaining Gomoku. Long text explaining Gomoku. Long text explaining Gomoku. Long text explaining Gomoku. ")));
 
 
 /***/ }),
@@ -15293,104 +15242,89 @@ exports.Help = function (_a) {
 
 "use strict";
 
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 Object.defineProperty(exports, "__esModule", { value: true });
-var THREE = __webpack_require__(84);
+const THREE = __webpack_require__(84);
 __webpack_require__(187);
 __webpack_require__(188);
-var React = __webpack_require__(0);
-var types_1 = __webpack_require__(11);
-var OrbitControls_1 = __webpack_require__(189);
-var range = function (start, end) {
-    return Array.from({ length: (end - start) }, function (v, k) { return k + start; });
-};
-var Board = /** @class */ (function (_super) {
-    __extends(Board, _super);
-    function Board() {
-        return _super !== null && _super.apply(this, arguments) || this;
+const React = __webpack_require__(0);
+const types_1 = __webpack_require__(11);
+const OrbitControls_1 = __webpack_require__(189);
+class Board extends React.Component {
+    constructor() {
+        super(...arguments);
+        this.tiles = [];
+        this.moves = {
+            played: [],
+            undone: [],
+        };
+        this.onMouseDown = (e) => {
+            const rect = this.domElement.getBoundingClientRect();
+            this.mouse = new THREE.Vector2(((e.clientX - rect.left) / rect.width) * 2 - 1, -((e.clientY - rect.top) / rect.height) * 2 + 1);
+        };
+        this.onClick = (e) => {
+            e.preventDefault();
+            const rect = this.domElement.getBoundingClientRect();
+            const mouseEnd = new THREE.Vector2(((e.clientX - rect.left) / rect.width) * 2 - 1, -((e.clientY - rect.top) / rect.height) * 2 + 1);
+            if (!this.mouse || mouseEnd.distanceTo(this.mouse) > 0.0001) {
+                return;
+            }
+            const raycaster = new THREE.Raycaster();
+            raycaster.setFromCamera(mouseEnd, this.camera);
+            const intersects = raycaster.intersectObjects(this.tiles);
+            if (intersects.length <= 0) {
+                return;
+            }
+            const selected = intersects[0].object;
+            this.place(selected.position.x, selected.position.y);
+        };
+        this.onWindowResize = () => {
+            this.camera.aspect = window.innerWidth / window.innerHeight;
+            this.camera.updateProjectionMatrix();
+            this.renderer.setSize(window.innerWidth, window.innerHeight);
+        };
     }
-    Board.prototype.shouldComponentUpdate = function () {
-        return false;
-    };
-    Board.prototype.componentDidMount = function () {
-        var camera, controlsOrbit, scene, renderer;
-        scene = new THREE.Scene();
-        scene.background = new THREE.Color(0xcccccc);
-        var container = document.getElementById('container');
-        renderer = new THREE.WebGLRenderer();
-        renderer.setPixelRatio(window.devicePixelRatio);
-        renderer.setSize(container.clientWidth, container.clientHeight);
-        container.appendChild(renderer.domElement);
-        camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000);
-        camera.position.z = 20;
-        camera.up.set(0, 0, 1);
-        controlsOrbit = new OrbitControls_1.OrbitControls(camera, renderer.domElement);
-        controlsOrbit.enableDamping = true;
-        controlsOrbit.dampingFactor = 0.25;
-        controlsOrbit.rotateSpeed = 0.4;
-        // lights
-        var light = new THREE.DirectionalLight(0xffffff);
-        light.position.set(1, 1, 1);
-        scene.add(light);
-        light = new THREE.DirectionalLight(0xaaaaaa);
-        light.position.set(-1, -1, -1);
-        scene.add(light);
-        light = new THREE.AmbientLight(0x555555);
-        scene.add(light);
-        // Main model
-        var lineMaterial = new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 2 });
-        var faceMaterial = new THREE.MeshPhongMaterial({
-            color: 0xffffff,
-            polygonOffset: true,
-            polygonOffsetFactor: 1,
-            polygonOffsetUnits: 1
-        });
-        range(0, 9).forEach(function (x) {
-            range(0, 9).forEach(function (y) {
-                var lineGeometry = new THREE.BufferGeometry();
-                lineGeometry.addAttribute('position', new THREE.Float32BufferAttribute([
-                    1, 1, .25, -1, 1, .25, -1, -1, .25, 1, -1, .25, 1, 1, .25,
-                    1, 1, -.25, 1, -1, -.25, 1, -1, .25, 1, -1, -.25, -1, -1, -.25,
-                    -1, -1, .25, -1, -1, -.25, -1, 1, -.25, -1, 1, .25, -1, 1, -.25,
-                    1, 1, -.25, 1, 1, .25,
-                ], 3));
-                lineGeometry.computeBoundingSphere();
-                var line = new THREE.Line(lineGeometry, lineMaterial);
-                var face = new THREE.Mesh(new THREE.BoxBufferGeometry(2, 2, .5), faceMaterial);
-                line.position.x = face.position.x = x * 2 - 9;
-                line.position.y = face.position.y = y * 2 - 9;
-                scene.add(line);
-                scene.add(face);
-            });
-        });
-        window.addEventListener('resize', onWindowResize, false);
-        function onWindowResize() {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        }
-        function animate() {
+    componentDidMount() {
+        this.domElement = document.getElementById('container');
+        this.renderer = new THREE.WebGLRenderer();
+        this.renderer.setPixelRatio(window.devicePixelRatio);
+        this.renderer.setSize(this.domElement.clientWidth, this.domElement.clientHeight);
+        this.domElement.appendChild(this.renderer.domElement);
+        this.scene = prepareScene();
+        this.camera = makeCamera();
+        this.tiles = generateBoard(9, 9, this.scene);
+        this.pieces = Array.from({ length: 9 }).map(x => Array.from({ length: 9 }).fill(null));
+        const controls = makeControls(this.camera, this.renderer);
+        const animate = () => {
             requestAnimationFrame(animate);
-            controlsOrbit.update();
-            render();
-        }
-        function render() {
-            renderer.render(scene, camera);
-        }
-        render(); // remove when using next line for animation loop (requestAnimationFrame)
+            controls.update();
+            this.renderer.render(this.scene, this.camera);
+        };
         animate();
-    };
-    Board.prototype.render = function () {
-        var switchPage = this.props.switchPage;
+        window.addEventListener('click', this.onClick);
+        window.addEventListener('mousedown', this.onMouseDown);
+        window.addEventListener('resize', this.onWindowResize);
+    }
+    componentWillUnmount() {
+        window.removeEventListener('click', this.onClick);
+        window.removeEventListener('mousedown', this.onMouseDown);
+        window.removeEventListener('resize', this.onWindowResize);
+    }
+    shouldComponentUpdate() {
+        return false;
+    }
+    place(x, y) {
+        const mat = new THREE.MeshPhongMaterial({ color: 0xff0000 });
+        const box = new THREE.Mesh(new THREE.BoxBufferGeometry(1, 1, 1), mat);
+        box.position.x = x;
+        box.position.y = y;
+        box.position.z = .75;
+        this.scene.add(box);
+        const tileX = (x + 9) / 2;
+        const tileY = (y + 9) / 2;
+        this.pieces[tileX][tileY] = box;
+    }
+    render() {
+        const { switchPage } = this.props;
         return React.createElement("div", { className: "wrapper" },
             React.createElement("div", { className: "header" },
                 React.createElement("a", { href: "#", onClick: switchPage(types_1.Page.Home), className: "back" },
@@ -15404,10 +15338,70 @@ var Board = /** @class */ (function (_super) {
                 React.createElement("div", null,
                     React.createElement("b", null, "Menu"))),
             React.createElement("div", { id: "container" }));
-    };
-    return Board;
-}(React.Component));
+    }
+}
 exports.Board = Board;
+function prepareScene() {
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xcccccc);
+    // lights
+    const light = new THREE.DirectionalLight(0xffffff);
+    light.position.set(0, 0, 20);
+    light.lookAt(new THREE.Vector3(0, 0, 0));
+    scene.add(light);
+    const light2 = new THREE.DirectionalLight(0xaaaaaa);
+    light2.position.set(-1, -1, -1);
+    scene.add(light2);
+    const light3 = new THREE.AmbientLight(0x555555);
+    scene.add(light3);
+    return scene;
+}
+function makeCamera() {
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000);
+    camera.position.z = 20;
+    camera.up.set(0, 0, 1);
+    return camera;
+}
+function makeControls(camera, renderer) {
+    const controls = new OrbitControls_1.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.25;
+    controls.rotateSpeed = 0.4;
+    return controls;
+}
+function generateBoard(xSize, ySize, scene) {
+    const lineMaterial = new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 2 });
+    const tileMaterial = new THREE.MeshPhongMaterial({
+        color: 0xffffff,
+        polygonOffset: true,
+        polygonOffsetFactor: 1,
+        polygonOffsetUnits: 1
+    });
+    const objs = [];
+    range(0, xSize).forEach((x) => {
+        range(0, ySize).forEach((y) => {
+            const lineGeometry = new THREE.BufferGeometry();
+            lineGeometry.addAttribute('position', new THREE.Float32BufferAttribute([
+                1, 1, .25, -1, 1, .25, -1, -1, .25, 1, -1, .25, 1, 1, .25,
+                1, 1, -.25, 1, -1, -.25, 1, -1, .25, 1, -1, -.25, -1, -1, -.25,
+                -1, -1, .25, -1, -1, -.25, -1, 1, -.25, -1, 1, .25, -1, 1, -.25,
+                1, 1, -.25, 1, 1, .25,
+            ], 3));
+            lineGeometry.computeBoundingSphere();
+            const line = new THREE.Line(lineGeometry, lineMaterial);
+            const tile = new THREE.Mesh(new THREE.BoxBufferGeometry(2, 2, .5), tileMaterial);
+            line.position.x = tile.position.x = x * 2 - xSize;
+            line.position.y = tile.position.y = y * 2 - ySize;
+            scene.add(line);
+            scene.add(tile);
+            objs.push(tile);
+        });
+    });
+    return objs;
+}
+function range(start, end) {
+    return Array.from({ length: (end - start) }, (v, k) => k + start);
+}
 
 
 /***/ }),
@@ -16695,7 +16689,7 @@ THREE.OBJLoader = ( function () {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var THREE = __webpack_require__(84);
+const THREE = __webpack_require__(84);
 exports.OrbitControls = function (object, domElement) {
     this.object = object;
     this.domElement = (domElement !== undefined) ? domElement : document;
@@ -17214,9 +17208,9 @@ exports.OrbitControls.prototype.constructor = THREE.OrbitControls;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var note_1 = __webpack_require__(191);
-var Sequence = /** @class */ (function () {
-    function Sequence(ac, tempo, arr) {
+const note_1 = __webpack_require__(191);
+class Sequence {
+    constructor(ac, tempo, arr) {
         this.loop = true;
         this.smoothing = 0;
         this.staccato = 0;
@@ -17226,7 +17220,7 @@ var Sequence = /** @class */ (function () {
         this.tempo = tempo;
         this.push.apply(this, arr || []);
     }
-    Sequence.prototype.createFxNodes = function () {
+    createFxNodes() {
         this.gain = this.ac.createGain();
         this.bass = this.ac.createBiquadFilter();
         this.bass.type = 'peaking';
@@ -17242,87 +17236,80 @@ var Sequence = /** @class */ (function () {
         this.mid.connect(this.treble);
         this.treble.connect(this.ac.destination);
         return this;
-    };
-    Sequence.prototype.push = function () {
-        var _this = this;
-        var notes = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            notes[_i] = arguments[_i];
-        }
-        notes.forEach(function (note) {
-            _this.notes.push(note instanceof note_1.Note ? note : new note_1.Note(note));
+    }
+    push(...notes) {
+        notes.forEach((note) => {
+            this.notes.push(note instanceof note_1.Note ? note : new note_1.Note(note));
         });
         return this;
-    };
+    }
     // get the next note
-    Sequence.prototype.getNextNote = function (index) {
+    getNextNote(index) {
         return this.notes[index < this.notes.length - 1 ? index + 1 : 0];
-    };
+    }
     ;
-    Sequence.prototype.scheduleNote = function (index, when) {
-        var duration = 60 / this.tempo * this.notes[index].duration;
-        var cutoff = duration * (1 - (this.staccato || 0));
+    scheduleNote(index, when) {
+        const duration = 60 / this.tempo * this.notes[index].duration;
+        const cutoff = duration * (1 - (this.staccato || 0));
         this.setFrequency(this.notes[index].frequency, when);
         if (this.smoothing && this.notes[index].frequency) {
             this.slide(index, when, cutoff);
         }
         this.setFrequency(0, when + cutoff);
         return when + duration;
-    };
+    }
     ;
     // set frequency at time
-    Sequence.prototype.setFrequency = function (freq, when) {
+    setFrequency(freq, when) {
         this.osc.frequency.setValueAtTime(freq, when);
         return this;
-    };
+    }
     ;
     // ramp to frequency at time
-    Sequence.prototype.rampFrequency = function (freq, when) {
+    rampFrequency(freq, when) {
         this.osc.frequency.linearRampToValueAtTime(freq, when);
         return this;
-    };
+    }
     ;
-    Sequence.prototype.slide = function (index, when, cutoff) {
-        var next = this.getNextNote(index);
-        var start = this.getSlideStartDelay(cutoff);
+    slide(index, when, cutoff) {
+        const next = this.getNextNote(index);
+        const start = this.getSlideStartDelay(cutoff);
         this.setFrequency(this.notes[index].frequency, when + start);
         this.rampFrequency(next.frequency, when + cutoff);
         return this;
-    };
-    Sequence.prototype.getSlideStartDelay = function (duration) {
+    }
+    getSlideStartDelay(duration) {
         return duration - Math.min(duration, 60 / this.tempo * this.smoothing);
-    };
+    }
     ;
-    Sequence.prototype.createOscillator = function () {
+    createOscillator() {
         this.stop();
         this.osc = this.ac.createOscillator();
         this.osc.type = 'triangle';
         this.osc.connect(this.gain);
         return this;
-    };
-    Sequence.prototype.stop = function () {
+    }
+    stop() {
         if (this.osc) {
             this.osc.onended = null;
             this.osc.disconnect();
             this.osc = null;
         }
         return this;
-    };
-    Sequence.prototype.play = function (when) {
-        var _this = this;
+    }
+    play(when) {
         when = typeof when === 'number' ? when : this.ac.currentTime;
         this.createOscillator();
         this.osc.start(when);
-        this.notes.forEach(function (note, i) {
-            when = _this.scheduleNote(i, when);
+        this.notes.forEach((note, i) => {
+            when = this.scheduleNote(i, when);
         });
         this.osc.stop(when);
         this.osc.onended = this.loop ? this.play.bind(this, when) : null;
         return this;
-    };
+    }
     ;
-    return Sequence;
-}());
+}
 exports.Sequence = Sequence;
 
 
@@ -17333,41 +17320,40 @@ exports.Sequence = Sequence;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var enharmonics = 'B#-C|C#-Db|D|D#-Eb|E-Fb|E#-F|F#-Gb|G|G#-Ab|A|A#-Bb|B-Cb';
-var middleC = 440 * Math.pow(Math.pow(2, 1 / 12), -9);
-var numeric = /^[0-9.]+$/;
-var octaveOffset = 4;
-var space = /\s+/;
-var num = /(\d+)/;
-var offsets = {};
+const enharmonics = 'B#-C|C#-Db|D|D#-Eb|E-Fb|E#-F|F#-Gb|G|G#-Ab|A|A#-Bb|B-Cb';
+const middleC = 440 * Math.pow(Math.pow(2, 1 / 12), -9);
+const numeric = /^[0-9.]+$/;
+const octaveOffset = 4;
+const space = /\s+/;
+const num = /(\d+)/;
+const offsets = {};
 enharmonics.split('|').forEach(function (val, i) {
     val.split('-').forEach(function (note) {
         offsets[note] = i;
     });
 });
-var Note = /** @class */ (function () {
-    function Note(str) {
+class Note {
+    constructor(str) {
         var couple = str.split(space);
         this.frequency = Note.getFrequency(couple[0]) || 0;
         this.duration = Note.getDuration(couple[1]) || 0;
     }
-    Note.getFrequency = function (name) {
-        var couple = name.split(num);
-        var distance = offsets[couple[0]];
-        var octaveDiff = (parseInt(couple[1]) || octaveOffset) - octaveOffset;
-        var freq = middleC * Math.pow(Math.pow(2, 1 / 12), distance);
+    static getFrequency(name) {
+        const couple = name.split(num);
+        const distance = offsets[couple[0]];
+        const octaveDiff = (parseInt(couple[1]) || octaveOffset) - octaveOffset;
+        const freq = middleC * Math.pow(Math.pow(2, 1 / 12), distance);
         return freq * Math.pow(2, octaveDiff);
-    };
-    Note.getDuration = function (symbol) {
+    }
+    static getDuration(symbol) {
         return numeric.test(symbol) ? parseFloat(symbol) :
             symbol.toLowerCase().split('').reduce(function (prev, curr) {
                 return prev + (curr === 'w' ? 4 : curr === 'h' ? 2 :
                     curr === 'q' ? 1 : curr === 'e' ? 0.5 :
                         curr === 's' ? 0.25 : 0);
             }, 0);
-    };
-    return Note;
-}());
+    }
+}
 exports.Note = Note;
 
 

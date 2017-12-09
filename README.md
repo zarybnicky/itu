@@ -39,16 +39,16 @@ After running the last command, the application will be available at http://loca
   Three.js modules.
 
 ## Tasks
-* break the board model down into individual tiles - in the end, we don't have
+* ~~break the board model down into individual tiles - in the end, we don't have
   to use the .obj and .mtl files, they were just the easiest way to do this at
   that time, we can directly use Three.js objects and simply map the textures
-  over them
+  over them~~
 * create X and O models - they can be exported from the .blend file where I
   modeled the prototype into .obj and .mtl files, I think
 * create logic that maps an internal state (represented as a sequence of moves?)
   to board state, and link back and forward buttons to this logic
-* find a way to map clicks to individual tile object, and implement 'onclick'
+* ~~find a way to map clicks to individual tile object, and implement 'onclick'
   logic - we might need to tap into the OrbitControls code, as they handle
-  'onmousedown' and 'onmouseup', I'm not sure.
+  'onmousedown' and 'onmouseup', I'm not sure.~~
 * remove 'Back' button from the Board page, and implement a menu (with settings,
   forfeit btn, what else?)
