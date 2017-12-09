@@ -5,77 +5,85 @@ import * as React from "react";
 import { Page } from '../types';
 import { OrbitControls } from '../OrbitControls';
 
+const range = (start: number, end: number) =>
+  Array.from({ length: (end - start) }, (v, k) => k + start);
+
 interface BoardProps {
   switchPage: (p: Page) => () => void;
 }
 export class Board extends React.Component<BoardProps, {}> {
+  shouldComponentUpdate() {
+    return false;
+  }
+
   componentDidMount() {
-    var camera: any, controlsOrbit: any, scene: any, renderer: any;
+    let camera: any, controlsOrbit: any, scene: any, renderer: any;
 
-    init();
-    render(); // remove when using next line for animation loop (requestAnimationFrame)
-    animate();
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xcccccc);
 
-    function init() {
-      scene = new THREE.Scene();
-      scene.background = new THREE.Color(0xcccccc);
+    let container = document.getElementById('container');
+    renderer = new THREE.WebGLRenderer();
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    container.appendChild(renderer.domElement);
 
-      var container = document.getElementById('container');
-      renderer = new THREE.WebGLRenderer();
-      renderer.setPixelRatio(window.devicePixelRatio);
-      renderer.setSize(container.clientWidth, container.clientHeight);
-      container.appendChild(renderer.domElement);
+    camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000);
+    camera.position.z = 20;
+    camera.up.set(0, 0, 1);
 
-      camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000);
-      camera.position.z = 20;
-      camera.up.set(0, 0, 1);
+    controlsOrbit = new (OrbitControls as any)(camera, renderer.domElement);
+    controlsOrbit.enableDamping = true;
+    controlsOrbit.dampingFactor = 0.25;
+    controlsOrbit.rotateSpeed = 0.4;
 
-      controlsOrbit = new (OrbitControls as any)(camera, renderer.domElement);
-      controlsOrbit.addEventListener('change', render); // remove when using animation loop
-      // enable animation loop when using damping or autorotation
-      controlsOrbit.enableDamping = true;
-      controlsOrbit.dampingFactor = 0.25;
-      controlsOrbit.rotateSpeed = 0.4;
+    // lights
+    let light: any = new THREE.DirectionalLight(0xffffff);
+    light.position.set(1, 1, 1);
+    scene.add(light);
 
-      var mtlLoader = new THREE.MTLLoader();
-      mtlLoader.load('assets/board.mtl', function(materials) {
-        materials.preload();
-        var objLoader = new THREE.OBJLoader();
-        objLoader.setMaterials(materials);
-        objLoader.load('assets/board.obj', function(object) {
-          object.scale.x = 1;
-          object.scale.y = 1;
-          object.scale.z = 1;
-          object.rotateX(-30);
-          object.receiveShadow = true;
-          scene.add(object);
-        });
+    light = new THREE.DirectionalLight(0xaaaaaa);
+    light.position.set(-1, -1, -1);
+    scene.add(light);
+
+    light = new THREE.AmbientLight(0x555555);
+    scene.add(light);
+
+
+    // Main model
+    let lineMaterial = new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 2 });
+    let faceMaterial = new THREE.MeshPhongMaterial({
+      color: 0xffffff,
+      polygonOffset: true,
+      polygonOffsetFactor: 1,
+      polygonOffsetUnits: 1
+    });
+
+    range(0, 9).forEach((x) => {
+      range(0, 9).forEach((y) => {
+        let lineGeometry = new THREE.BufferGeometry();
+        lineGeometry.addAttribute('position', new THREE.Float32BufferAttribute([
+          1, 1, .25, -1, 1, .25, -1, -1, .25, 1, -1, .25, 1, 1, .25,
+          1, 1, -.25, 1, -1, -.25, 1, -1, .25, 1, -1, -.25, -1, -1, -.25,
+          -1, -1, .25, -1, -1, -.25, -1, 1, -.25, -1, 1, .25, -1, 1, -.25,
+          1, 1, -.25, 1, 1, .25,
+        ], 3));
+        lineGeometry.computeBoundingSphere();
+
+        const line = new THREE.Line(lineGeometry, lineMaterial)
+        const face = new THREE.Mesh(new THREE.BoxBufferGeometry(2, 2, .5), faceMaterial);
+        line.position.x = face.position.x = x * 2 - 9;
+        line.position.y = face.position.y = y * 2 - 9;
+
+        scene.add(line);
+        scene.add(face);
       });
+    });
 
-      /* var geometry = new THREE.BoxBufferGeometry(10, 10, 1);
-       * var material = new THREE.MeshPhongMaterial({color: 0xff00ff });
-       * var mesh = new THREE.Mesh(geometry, material);
-       * scene.add(mesh);*/
-
-      // lights
-      let light: any = new THREE.DirectionalLight(0xffffff);
-      light.position.set(1, 1, 1);
-      scene.add(light);
-
-      light = new THREE.DirectionalLight(0xaaaaaa);
-      light.position.set(-1, -1, -1);
-      scene.add(light);
-
-      light = new THREE.AmbientLight(0x222222);
-      scene.add(light);
-
-      window.addEventListener('resize', onWindowResize, false);
-    }
-
+    window.addEventListener('resize', onWindowResize, false);
     function onWindowResize() {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
-
       renderer.setSize(window.innerWidth, window.innerHeight);
     }
 
@@ -88,6 +96,8 @@ export class Board extends React.Component<BoardProps, {}> {
     function render() {
       renderer.render(scene, camera);
     }
+    render(); // remove when using next line for animation loop (requestAnimationFrame)
+    animate();
   }
   render() {
     const { switchPage } = this.props;
