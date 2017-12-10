@@ -25,6 +25,8 @@ export class Board extends React.Component<BoardProps, {}> {
     undone: [] as Move[],
   };
   mouse: THREE.Vector2;
+  moveId: number = -1;
+  myMoves: Array<THREE.Object3D> = [];
 
   componentDidMount() {
     this.domElement = document.getElementById('container');
@@ -89,6 +91,16 @@ export class Board extends React.Component<BoardProps, {}> {
     this.place(selected.position.x, selected.position.y);
   }
 
+  goBack = () => {
+    this.scene.remove(this.scene.getObjectById(this.myMoves[this.moveId].id));
+    this.moveId--;
+  }
+
+  goForward = (e: any) => {
+    this.scene.add(this.scene.getObjectById(this.myMoves[this.moveId].id));
+    this.moveId++;
+  }
+
   place(x: number, y: number) {
     const mat = new THREE.MeshPhongMaterial({ color: 0xff0000 });
     const geometry = new THREE.TorusGeometry( 0.6, 0.2, 8, 20 );
@@ -97,6 +109,9 @@ export class Board extends React.Component<BoardProps, {}> {
     donut.position.y = y;
     donut.position.z = .75;
     this.scene.add(donut);
+    //this.Donut = donut.id;
+    this.myMoves.push(donut);
+    this.moveId++;
 
     const tileX = (x + 9) / 2;
     const tileY = (y + 9) / 2;
@@ -117,8 +132,16 @@ export class Board extends React.Component<BoardProps, {}> {
           <img src="assets/left.png" height="12" /> Back
         </a>
         <div className="title"></div>
-        <div><img src="assets/left.png" height="12" /></div>
-        <div><img src="assets/right.png" height="12" /></div>
+        <div>
+            <a href="#" onClick={this.goBack} className="goBack">
+                <img src="assets/left.png" height="12" />
+            </a>
+        </div>
+        <div>
+            <a href="#" onClick={this.goForward} className="goForward">
+                <img src="assets/right.png" height="12" />
+            </a>
+        </div>
         <div><b>Menu</b></div>
       </div>
       <div id="container"></div>
