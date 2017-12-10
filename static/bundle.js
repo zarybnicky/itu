@@ -15257,6 +15257,8 @@ class Board extends React.Component {
             played: [],
             undone: [],
         };
+        this.moveIndex = -1;
+        this.myMoves = [];
         this.onMouseDown = (e) => {
             const rect = this.domElement.getBoundingClientRect();
             this.mouse = new THREE.Vector2(((e.clientX - rect.left) / rect.width) * 2 - 1, -((e.clientY - rect.top) / rect.height) * 2 + 1);
@@ -15276,6 +15278,20 @@ class Board extends React.Component {
             }
             const selected = intersects[0].object;
             this.place(selected.position.x, selected.position.y);
+        };
+        this.goBack = () => {
+            if (this.moveIndex <= -1) {
+                return;
+            }
+            this.scene.remove(this.scene.getObjectById(this.myMoves[this.moveIndex].id));
+            this.moveIndex--;
+        };
+        this.goForward = (e) => {
+            if (this.moveIndex >= this.myMoves.length - 1) {
+                return;
+            }
+            this.moveIndex++;
+            this.scene.add(this.myMoves[this.moveIndex]);
         };
         this.onWindowResize = () => {
             this.camera.aspect = window.innerWidth / window.innerHeight;
@@ -15344,12 +15360,13 @@ class Board extends React.Component {
             placee = new THREE.Mesh(donut.geometry, donut.material);
             this.inGameShape = 1;
         }
-        //if (1)
-        //placee = new THREE.Mesh( donut.geometry, donut.material );
         placee.position.x = x;
         placee.position.y = y;
         placee.position.z = .75;
         this.scene.add(placee);
+        this.moveIndex++;
+        this.myMoves = this.myMoves.slice(0, this.moveIndex);
+        this.myMoves.push(placee);
         const tileX = (x + 9) / 2;
         const tileY = (y + 9) / 2;
         this.pieces[tileX][tileY] = placee;
@@ -15363,9 +15380,11 @@ class Board extends React.Component {
                     " Back"),
                 React.createElement("div", { className: "title" }),
                 React.createElement("div", null,
-                    React.createElement("img", { src: "assets/left.png", height: "12" })),
+                    React.createElement("a", { href: "#", onClick: this.goBack, className: "goBack" },
+                        React.createElement("img", { src: "assets/left.png", height: "12" }))),
                 React.createElement("div", null,
-                    React.createElement("img", { src: "assets/right.png", height: "12" })),
+                    React.createElement("a", { href: "#", onClick: this.goForward, className: "goForward" },
+                        React.createElement("img", { src: "assets/right.png", height: "12" }))),
                 React.createElement("div", null,
                     React.createElement("b", null, "Menu"))),
             React.createElement("div", { id: "container" }));
