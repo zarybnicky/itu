@@ -141,7 +141,7 @@ export class Board extends React.Component<BoardProps, {}> {
     placee.position.z = .75;
     this.scene.add(placee);
 
-    this.myMoves.push(donut);
+    this.myMoves.push(placee);
     this.moveId++;
 
     const tileX = (x + 9) / 2;
