@@ -15314,7 +15314,9 @@ class Board extends React.Component {
     }
     place(x, y) {
         const mat = new THREE.MeshPhongMaterial({ color: 0xff0000 });
-        const box = new THREE.Mesh(new THREE.BoxBufferGeometry(1, 1, 1), mat);
+        //const mat = new THREE.LineBasicMaterial({ color: 0xff0000 });
+        const geometry = new THREE.TorusGeometry(0.6, 0.2, 8, 20);
+        const box = new THREE.Mesh(geometry, mat);
         box.position.x = x;
         box.position.y = y;
         box.position.z = .75;
