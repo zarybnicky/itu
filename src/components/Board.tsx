@@ -7,7 +7,8 @@ import { OrbitControls } from '../OrbitControls';
 import { Variant } from '../types';
 
 interface Move {
-  player: 'x' | 'o';
+  obj: THREE.Object3D;
+  isX: boolean;
   x: number;
   y: number;
 }
@@ -21,16 +22,13 @@ export class Board extends React.Component<BoardProps, {}> {
   camera: THREE.PerspectiveCamera;
   domElement: HTMLElement;
   tiles: THREE.Object3D[] = [];
-  pieces: (THREE.Object3D | null)[][];
+  pieces: (Move | null)[][];
   scene: THREE.Scene;
-  inGameShape: number;
   moves = {
     played: [] as Move[],
     undone: [] as Move[],
   };
   mouse: THREE.Vector2;
-  moveIndex: number = -1;
-  myMoves: Array<THREE.Object3D> = [];
 
   componentDidMount() {
     const size = this.props.size;
@@ -45,7 +43,6 @@ export class Board extends React.Component<BoardProps, {}> {
     this.camera = makeCamera();
     this.tiles = generateBoard(size, size, this.scene);
     this.pieces = Array.from({ length: size }).map(x => Array.from<{}, null>({ length: size }).fill(null));
-    this.inGameShape = 1;
 
     const controls = makeControls(this.camera, this.renderer);
     const animate = () => {
@@ -99,16 +96,20 @@ export class Board extends React.Component<BoardProps, {}> {
   }
 
   goBack = () => {
-    if (this.moveIndex > -1) {
-      this.scene.remove(this.scene.getObjectById(this.myMoves[this.moveIndex].id));
-      this.moveIndex--;
+    if (this.moves.played.length > 0) {
+      const m = this.moves.played.pop();
+      this.scene.remove(m.obj);
+      this.moves.undone.push(m);
+      this.pieces[m.x][m.y] = null;
     }
   }
 
   goForward = (e: any) => {
-    if (this.moveIndex < this.myMoves.length - 1) {
-      this.moveIndex++;
-      this.scene.add(this.myMoves[this.moveIndex]);
+    if (this.moves.undone.length > 0) {
+      const m = this.moves.undone.pop();
+      this.scene.add(m.obj);
+      this.moves.played.push(m);
+      this.pieces[m.x][m.y] = m;
     }
   }
 
@@ -120,22 +121,18 @@ export class Board extends React.Component<BoardProps, {}> {
       return;
     }
 
-    let placee;
-    if (this.inGameShape) {
-      placee = makeX();
-      this.inGameShape = 0;
-    } else {
-      placee = makeO();
-      this.inGameShape = 1;
-    }
-    placee.position.set(x, y, .25);
-    this.scene.add(placee);
+    const wasX = this.moves.played.length ?
+      this.moves.played[this.moves.played.length - 1].isX :
+      false;
+    const move = wasX
+      ? { isX: false, obj: makeO(), x: tileX, y: tileY }
+      : { isX: true, obj: makeX(), x: tileX, y: tileY };
+    move.obj.position.set(x, y, .25);
 
-    this.moveIndex++;
-    this.myMoves = this.myMoves.slice(0, this.moveIndex);
-    this.myMoves.push(placee);
-
-    this.pieces[tileX][tileY] = placee;
+    this.scene.add(move.obj);
+    this.moves.played.push(move);
+    this.moves.undone = [];
+    this.pieces[tileX][tileY] = move;
   }
 
   onWindowResize = () => {
