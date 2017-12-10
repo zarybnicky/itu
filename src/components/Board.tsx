@@ -91,15 +91,16 @@ export class Board extends React.Component<BoardProps, {}> {
 
   place(x: number, y: number) {
     const mat = new THREE.MeshPhongMaterial({ color: 0xff0000 });
-    const box = new THREE.Mesh(new THREE.BoxBufferGeometry(1, 1, 1), mat);
-    box.position.x = x;
-    box.position.y = y;
-    box.position.z = .75;
-    this.scene.add(box);
+    const geometry = new THREE.TorusGeometry( 0.6, 0.2, 8, 20 );
+    const donut = new THREE.Mesh( geometry, mat );
+    donut.position.x = x;
+    donut.position.y = y;
+    donut.position.z = .75;
+    this.scene.add(donut);
 
     const tileX = (x + 9) / 2;
     const tileY = (y + 9) / 2;
-    this.pieces[tileX][tileY] = box;
+    this.pieces[tileX][tileY] = donut;
   }
 
   onWindowResize = () => {
