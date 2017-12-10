@@ -99,81 +99,43 @@ export class Board extends React.Component<BoardProps, {}> {
   }
 
   goBack = () => {
-    if (this.moveIndex <= -1) {
-      return;
+    if (this.moveIndex > -1) {
+      this.scene.remove(this.scene.getObjectById(this.myMoves[this.moveIndex].id));
+      this.moveIndex--;
     }
-    this.scene.remove(this.scene.getObjectById(this.myMoves[this.moveIndex].id));
-    this.moveIndex--;
   }
 
   goForward = (e: any) => {
-    if (this.moveIndex >= this.myMoves.length - 1) {
-      return;
+    if (this.moveIndex < this.myMoves.length - 1) {
+      this.moveIndex++;
+      this.scene.add(this.myMoves[this.moveIndex]);
     }
-
-    this.moveIndex++;
-    this.scene.add(this.myMoves[this.moveIndex]);
   }
 
   place(x: number, y: number) {
-    if (!this.alreadyFull((x + 9) / 2, (y + 9) / 2)) {
+    const tileX = (x + this.props.size) / 2;
+    const tileY = (y + this.props.size) / 2;
+
+    if (this.pieces[tileX][tileY] != null) {
       return;
     }
-    const mat = new THREE.MeshPhongMaterial({ color: 0xff0000 });
-    const donutGeometry = new THREE.TorusGeometry(0.6, 0.2, 12, 45);
-    var donut = { geometry: donutGeometry, material: mat };
 
-    var xShape = new THREE.Shape();
-    xShape.moveTo(-0.05, -0.25);
-    xShape.lineTo(0.05, -0.25);
-    xShape.lineTo(0.05, -0.05);
-    xShape.lineTo(0.25, -0.05);
-    xShape.lineTo(0.25, 0.05);
-    xShape.lineTo(0.05, 0.05);
-    xShape.lineTo(0.05, 0.25);
-    xShape.lineTo(-0.05, 0.25);
-    xShape.lineTo(-0.05, 0.05);
-    xShape.lineTo(-0.25, 0.05);
-    xShape.lineTo(-0.25, -0.05);
-    xShape.lineTo(-0.05, -0.05);
-    xShape.lineTo(-0.05, -0.25);
-
-    var extrudeSettings = {
-      amount: 0.2, bevelEnabled: false, bevelSegments: 2,
-      steps: 2, bevelSize: 1, bevelThickness: 1
-    };
-    var xGeometry = new THREE.ExtrudeGeometry(xShape, extrudeSettings);
-
-    var placee;
+    let placee;
     if (this.inGameShape) {
-      placee = new THREE.Mesh(xGeometry, new THREE.MeshPhongMaterial({ color: 0x00ff00, side: THREE.DoubleSide }));
+      placee = makeX();
       this.inGameShape = 0;
-      placee.scale.set(2.7, 2.7, 1);
-      placee.rotation.set(0, 0, Math.PI / 4);
     } else {
-      placee = new THREE.Mesh(donut.geometry, donut.material);
+      placee = makeO();
       this.inGameShape = 1;
     }
-    placee.position.x = x;
-    placee.position.y = y;
-    placee.position.z = .75;
+    placee.position.set(x, y, .25);
     this.scene.add(placee);
 
     this.moveIndex++;
     this.myMoves = this.myMoves.slice(0, this.moveIndex);
     this.myMoves.push(placee);
 
-
-    const tileX = (x + this.props.size) / 2;
-    const tileY = (y + this.props.size) / 2;
     this.pieces[tileX][tileY] = placee;
-  }
-
-  alreadyFull(x: number, y: number): boolean {
-    if (this.pieces[x][y] == null) {
-      return true;
-    }
-    return false;
   }
 
   onWindowResize = () => {
@@ -240,6 +202,41 @@ function makeControls(camera: THREE.Camera, renderer: THREE.Renderer): any {
   controls.dampingFactor = 0.25;
   controls.rotateSpeed = 0.4;
   return controls;
+}
+
+function makeX() {
+  const xShape = new THREE.Shape();
+  xShape.moveTo(-0.05, -0.25);
+  xShape.lineTo(0.05, -0.25);
+  xShape.lineTo(0.05, -0.05);
+  xShape.lineTo(0.25, -0.05);
+  xShape.lineTo(0.25, 0.05);
+  xShape.lineTo(0.05, 0.05);
+  xShape.lineTo(0.05, 0.25);
+  xShape.lineTo(-0.05, 0.25);
+  xShape.lineTo(-0.05, 0.05);
+  xShape.lineTo(-0.25, 0.05);
+  xShape.lineTo(-0.25, -0.05);
+  xShape.lineTo(-0.05, -0.05);
+  xShape.lineTo(-0.05, -0.25);
+
+  const obj = new THREE.Mesh(
+    new THREE.ExtrudeGeometry(xShape, {
+      amount: 0.2, bevelEnabled: false, bevelSegments: 2,
+      steps: 2, bevelSize: 1, bevelThickness: 1
+    }),
+    new THREE.MeshPhongMaterial({ color: 0x00ff00, side: THREE.DoubleSide }),
+  );
+  obj.scale.set(2.7, 2.7, 1);
+  obj.rotation.set(0, 0, Math.PI / 4);
+  return obj;
+}
+
+function makeO() {
+  return new THREE.Mesh(
+    new THREE.TorusGeometry(0.6, 0.2, 12, 45),
+    new THREE.MeshPhongMaterial({ color: 0xff0000 }),
+  );
 }
 
 function generateBoard(xSize: number, ySize: number, scene: THREE.Scene): THREE.Object3D[] {
