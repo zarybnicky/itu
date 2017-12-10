@@ -15293,6 +15293,7 @@ class Board extends React.Component {
         this.camera = makeCamera();
         this.tiles = generateBoard(9, 9, this.scene);
         this.pieces = Array.from({ length: 9 }).map(x => Array.from({ length: 9 }).fill(null));
+        this.inGameShape = 1;
         const controls = makeControls(this.camera, this.renderer);
         const animate = () => {
             requestAnimationFrame(animate);
@@ -15314,16 +15315,44 @@ class Board extends React.Component {
     }
     place(x, y) {
         const mat = new THREE.MeshPhongMaterial({ color: 0xff0000 });
-        //const mat = new THREE.LineBasicMaterial({ color: 0xff0000 });
-        const geometry = new THREE.TorusGeometry(0.6, 0.2, 8, 20);
-        const box = new THREE.Mesh(geometry, mat);
-        box.position.x = x;
-        box.position.y = y;
-        box.position.z = .75;
-        this.scene.add(box);
+        const donutGeometry = new THREE.TorusGeometry(0.6, 0.2, 12, 45);
+        var donut = { geometry: donutGeometry, material: mat };
+        var xShape = new THREE.Shape();
+        xShape.moveTo(-0.05, -0.25);
+        xShape.lineTo(0.05, -0.25);
+        xShape.lineTo(0.05, -0.05);
+        xShape.lineTo(0.25, -0.05);
+        xShape.lineTo(0.25, 0.05);
+        xShape.lineTo(0.05, 0.05);
+        xShape.lineTo(0.05, 0.25);
+        xShape.lineTo(-0.05, 0.25);
+        xShape.lineTo(-0.05, 0.05);
+        xShape.lineTo(-0.25, 0.05);
+        xShape.lineTo(-0.25, -0.05);
+        xShape.lineTo(-0.05, -0.05);
+        xShape.lineTo(-0.05, -0.25);
+        var extrudeSettings = { amount: 0.2, bevelEnabled: false, bevelSegments: 2, steps: 2, bevelSize: 1, bevelThickness: 1 };
+        var xGeometry = new THREE.ExtrudeGeometry(xShape, extrudeSettings);
+        var placee;
+        if (this.inGameShape) {
+            placee = new THREE.Mesh(xGeometry, new THREE.MeshPhongMaterial({ color: 0x00ff00, side: THREE.DoubleSide }));
+            this.inGameShape = 0;
+            placee.scale.set(2.7, 2.7, 1);
+            placee.rotation.set(0, 0, Math.PI / 4);
+        }
+        else {
+            placee = new THREE.Mesh(donut.geometry, donut.material);
+            this.inGameShape = 1;
+        }
+        //if (1)
+        //placee = new THREE.Mesh( donut.geometry, donut.material );
+        placee.position.x = x;
+        placee.position.y = y;
+        placee.position.z = .75;
+        this.scene.add(placee);
         const tileX = (x + 9) / 2;
         const tileY = (y + 9) / 2;
-        this.pieces[tileX][tileY] = box;
+        this.pieces[tileX][tileY] = placee;
     }
     render() {
         const { switchPage } = this.props;
