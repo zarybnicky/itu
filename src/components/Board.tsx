@@ -111,6 +111,9 @@ export class Board extends React.Component<BoardProps, {}> {
   }
 
   place(x: number, y: number) {
+      if(!this.alreadyFull((x + 9) / 2, (y + 9) / 2)) {
+          return;
+      }
     const mat = new THREE.MeshPhongMaterial({ color: 0xff0000 });
     const donutGeometry = new THREE.TorusGeometry( 0.6, 0.2, 12, 45 );
     var donut = {geometry: donutGeometry, material: mat};
@@ -156,6 +159,13 @@ export class Board extends React.Component<BoardProps, {}> {
     const tileX = (x + 9) / 2;
     const tileY = (y + 9) / 2;
     this.pieces[tileX][tileY] = placee;
+  }
+
+  alreadyFull(x: number, y:number): boolean  {
+        if (this.pieces[x][y] == null) {
+            return true;
+        }
+        return false;
   }
 
   onWindowResize = () => {
