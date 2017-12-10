@@ -26,7 +26,7 @@ export class Board extends React.Component<BoardProps, {}> {
     undone: [] as Move[],
   };
   mouse: THREE.Vector2;
-  moveId: number = -1;
+  moveIndex: number = -1;
   myMoves: Array<THREE.Object3D> = [];
 
   componentDidMount() {
@@ -94,13 +94,20 @@ export class Board extends React.Component<BoardProps, {}> {
   }
 
   goBack = () => {
-    this.scene.remove(this.scene.getObjectById(this.myMoves[this.moveId].id));
-    this.moveId--;
+      if(this.moveIndex <= -1) {
+          return;
+      }
+    this.scene.remove(this.scene.getObjectById(this.myMoves[this.moveIndex].id));
+    this.moveIndex--;
   }
 
   goForward = (e: any) => {
-    this.scene.add(this.scene.getObjectById(this.myMoves[this.moveId].id));
-    this.moveId++;
+      if(this.moveIndex >= this.myMoves.length - 1) {
+          return;
+     }
+
+    this.moveIndex++;
+    this.scene.add(this.myMoves[this.moveIndex]);
   }
 
   place(x: number, y: number) {
@@ -141,8 +148,10 @@ export class Board extends React.Component<BoardProps, {}> {
     placee.position.z = .75;
     this.scene.add(placee);
 
+    this.moveIndex++;
+    this.myMoves = this.myMoves.slice(0, this.moveIndex);
     this.myMoves.push(placee);
-    this.moveId++;
+
 
     const tileX = (x + 9) / 2;
     const tileY = (y + 9) / 2;
