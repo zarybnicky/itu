@@ -4,6 +4,7 @@ import 'three/examples/js/loaders/OBJLoader';
 import * as React from "react";
 import { Page } from '../types';
 import { OrbitControls } from '../OrbitControls';
+import { Variant } from '../types';
 
 interface Move {
   player: 'x' | 'o';
@@ -12,6 +13,8 @@ interface Move {
 }
 interface BoardProps {
   switchPage: (p: Page) => () => void;
+  size: number;
+  variant: Variant;
 }
 export class Board extends React.Component<BoardProps, {}> {
   renderer: THREE.WebGLRenderer;
@@ -30,6 +33,8 @@ export class Board extends React.Component<BoardProps, {}> {
   myMoves: Array<THREE.Object3D> = [];
 
   componentDidMount() {
+    const size = this.props.size;
+
     this.domElement = document.getElementById('container');
     this.renderer = new THREE.WebGLRenderer();
     this.renderer.setPixelRatio(window.devicePixelRatio);
@@ -38,8 +43,8 @@ export class Board extends React.Component<BoardProps, {}> {
 
     this.scene = prepareScene();
     this.camera = makeCamera();
-    this.tiles = generateBoard(9, 9, this.scene);
-    this.pieces = Array.from({ length: 9 }).map(x => Array.from<{}, null>({ length: 9 }).fill(null));
+    this.tiles = generateBoard(size, size, this.scene);
+    this.pieces = Array.from({ length: size }).map(x => Array.from<{}, null>({ length: size }).fill(null));
     this.inGameShape = 1;
 
     const controls = makeControls(this.camera, this.renderer);
@@ -94,29 +99,29 @@ export class Board extends React.Component<BoardProps, {}> {
   }
 
   goBack = () => {
-      if(this.moveIndex <= -1) {
-          return;
-      }
+    if (this.moveIndex <= -1) {
+      return;
+    }
     this.scene.remove(this.scene.getObjectById(this.myMoves[this.moveIndex].id));
     this.moveIndex--;
   }
 
   goForward = (e: any) => {
-      if(this.moveIndex >= this.myMoves.length - 1) {
-          return;
-     }
+    if (this.moveIndex >= this.myMoves.length - 1) {
+      return;
+    }
 
     this.moveIndex++;
     this.scene.add(this.myMoves[this.moveIndex]);
   }
 
   place(x: number, y: number) {
-      if(!this.alreadyFull((x + 9) / 2, (y + 9) / 2)) {
-          return;
-      }
+    if (!this.alreadyFull((x + 9) / 2, (y + 9) / 2)) {
+      return;
+    }
     const mat = new THREE.MeshPhongMaterial({ color: 0xff0000 });
-    const donutGeometry = new THREE.TorusGeometry( 0.6, 0.2, 12, 45 );
-    var donut = {geometry: donutGeometry, material: mat};
+    const donutGeometry = new THREE.TorusGeometry(0.6, 0.2, 12, 45);
+    var donut = { geometry: donutGeometry, material: mat };
 
     var xShape = new THREE.Shape();
     xShape.moveTo(-0.05, -0.25);
@@ -133,17 +138,20 @@ export class Board extends React.Component<BoardProps, {}> {
     xShape.lineTo(-0.05, -0.05);
     xShape.lineTo(-0.05, -0.25);
 
-    var extrudeSettings = { amount: 0.2, bevelEnabled: false, bevelSegments: 2, steps: 2, bevelSize: 1, bevelThickness: 1};
-    var xGeometry = new THREE.ExtrudeGeometry( xShape, extrudeSettings );
+    var extrudeSettings = {
+      amount: 0.2, bevelEnabled: false, bevelSegments: 2,
+      steps: 2, bevelSize: 1, bevelThickness: 1
+    };
+    var xGeometry = new THREE.ExtrudeGeometry(xShape, extrudeSettings);
 
     var placee;
-    if (this.inGameShape)  {
-      placee = new THREE.Mesh( xGeometry, new THREE.MeshPhongMaterial( { color: 0x00ff00, side: THREE.DoubleSide } ) );
+    if (this.inGameShape) {
+      placee = new THREE.Mesh(xGeometry, new THREE.MeshPhongMaterial({ color: 0x00ff00, side: THREE.DoubleSide }));
       this.inGameShape = 0;
       placee.scale.set(2.7, 2.7, 1);
       placee.rotation.set(0, 0, Math.PI / 4);
     } else {
-      placee = new THREE.Mesh( donut.geometry, donut.material );
+      placee = new THREE.Mesh(donut.geometry, donut.material);
       this.inGameShape = 1;
     }
     placee.position.x = x;
@@ -156,16 +164,16 @@ export class Board extends React.Component<BoardProps, {}> {
     this.myMoves.push(placee);
 
 
-    const tileX = (x + 9) / 2;
-    const tileY = (y + 9) / 2;
+    const tileX = (x + this.props.size) / 2;
+    const tileY = (y + this.props.size) / 2;
     this.pieces[tileX][tileY] = placee;
   }
 
-  alreadyFull(x: number, y:number): boolean  {
-        if (this.pieces[x][y] == null) {
-            return true;
-        }
-        return false;
+  alreadyFull(x: number, y: number): boolean {
+    if (this.pieces[x][y] == null) {
+      return true;
+    }
+    return false;
   }
 
   onWindowResize = () => {
@@ -183,14 +191,14 @@ export class Board extends React.Component<BoardProps, {}> {
         </a>
         <div className="title"></div>
         <div>
-            <a href="#" onClick={this.goBack} className="goBack">
-                <img src="assets/left.png" height="12" />
-            </a>
+          <a href="#" onClick={this.goBack} className="goBack">
+            <img src="assets/left.png" height="12" />
+          </a>
         </div>
         <div>
-            <a href="#" onClick={this.goForward} className="goForward">
-                <img src="assets/right.png" height="12" />
-            </a>
+          <a href="#" onClick={this.goForward} className="goForward">
+            <img src="assets/right.png" height="12" />
+          </a>
         </div>
         <div><b>Menu</b></div>
       </div>

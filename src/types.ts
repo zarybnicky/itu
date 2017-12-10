@@ -7,10 +7,10 @@ export enum Page {
   Board,
 }
 export enum Variant {
-  x3 = '3x3',
-  x9 = '9x9',
-  x18 = '18x18',
-  x36 = '36x36',
+  threeInARow = 'Three-in-a-row',
+  fourInARow = 'Four-in-a-row',
+  fiveInARow = 'Five-in-a-row',
+  sixInARow = 'Six-in-a-row',
 }
 export enum Difficulty {
   Easy = 'Easy',

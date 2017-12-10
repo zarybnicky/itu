@@ -7,11 +7,14 @@ import { Settings } from './Settings';
 import { Help } from './Help';
 import { Board } from './Board';
 import { Sequence } from '../sequence';
+import { Variant } from '../types';
 
 interface AppState {
   page: Page;
   sound: number;
   music: number;
+  variant: Variant;
+  size: number;
 }
 
 export class App extends React.Component<{}, AppState> {
@@ -19,10 +22,14 @@ export class App extends React.Component<{}, AppState> {
     page: Page.Home,
     sound: 50,
     music: 50,
+    variant: Variant.fiveInARow,
+    size: 9,
   }
   switchPage = (page: Page) => () => this.setState({ page });
   onSoundChange = (sound: number) => this.setState({ sound });
   onMusicChange = (music: number) => this.setState({ music });
+  onVariantChange = (variant: Variant) => this.setState({ variant });
+  onSizeChange = (size: number) => this.setState({ size });
   sequence: Sequence;
 
   //  D E Fis G A B Cis
@@ -67,21 +74,21 @@ export class App extends React.Component<{}, AppState> {
   }
 
   render() {
-    const { switchPage, onSoundChange, onMusicChange } = this;
-    const { sound, music } = this.state;
+    const { switchPage, onSoundChange, onMusicChange, onSizeChange, onVariantChange } = this;
+    const { sound, music, size, variant } = this.state;
     switch (this.state.page) {
       case Page.Home:
         return <Home switchPage={this.switchPage} />;
       case Page.SinglePlayer:
-        return <SinglePlayer {...{ switchPage }} />;
+        return <SinglePlayer {...{ switchPage, onSizeChange, onVariantChange, size, variant }} />;
       case Page.MultiPlayer:
-        return <MultiPlayer {...{ switchPage }} />;
+        return <MultiPlayer {...{ switchPage, onSizeChange, onVariantChange, size, variant }} />;
       case Page.Settings:
         return <Settings {...{ switchPage, onSoundChange, onMusicChange, music, sound }} />;
       case Page.Help:
         return <Help {...{ switchPage }} />;
       case Page.Board:
-        return <Board {...{ switchPage }} />;
+        return <Board {...{ switchPage, size, variant }} />;
     }
   }
 }
