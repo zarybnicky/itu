@@ -4,32 +4,35 @@ import 'three/examples/js/loaders/OBJLoader';
 import * as React from "react";
 import { Page } from '../types';
 import { OrbitControls } from '../OrbitControls';
+import { Variant } from '../types';
 
 interface Move {
-  player: 'x' | 'o';
+  obj: THREE.Object3D;
+  isX: boolean;
   x: number;
   y: number;
 }
 interface BoardProps {
   switchPage: (p: Page) => () => void;
+  size: number;
+  variant: Variant;
 }
 export class Board extends React.Component<BoardProps, {}> {
   renderer: THREE.WebGLRenderer;
   camera: THREE.PerspectiveCamera;
   domElement: HTMLElement;
   tiles: THREE.Object3D[] = [];
-  pieces: (THREE.Object3D | null)[][];
+  pieces: (Move | null)[][];
   scene: THREE.Scene;
-  inGameShape: number;
   moves = {
     played: [] as Move[],
     undone: [] as Move[],
   };
   mouse: THREE.Vector2;
-  moveIndex: number = -1;
-  myMoves: Array<THREE.Object3D> = [];
 
   componentDidMount() {
+    const size = this.props.size;
+
     this.domElement = document.getElementById('container');
     this.renderer = new THREE.WebGLRenderer();
     this.renderer.setPixelRatio(window.devicePixelRatio);
@@ -38,9 +41,8 @@ export class Board extends React.Component<BoardProps, {}> {
 
     this.scene = prepareScene();
     this.camera = makeCamera();
-    this.tiles = generateBoard(9, 9, this.scene);
-    this.pieces = Array.from({ length: 9 }).map(x => Array.from<{}, null>({ length: 9 }).fill(null));
-    this.inGameShape = 1;
+    this.tiles = generateBoard(size, size, this.scene);
+    this.pieces = Array.from({ length: size }).map(x => Array.from<{}, null>({ length: size }).fill(null));
 
     const controls = makeControls(this.camera, this.renderer);
     const animate = () => {
@@ -94,28 +96,47 @@ export class Board extends React.Component<BoardProps, {}> {
   }
 
   goBack = () => {
-      if(this.moveIndex <= -1) {
-          return;
-      }
-    this.scene.remove(this.scene.getObjectById(this.myMoves[this.moveIndex].id));
-    this.moveIndex--;
+    if (this.moves.played.length > 0) {
+      const m = this.moves.played.pop();
+      this.scene.remove(m.obj);
+      this.moves.undone.push(m);
+      this.pieces[m.x][m.y] = null;
+    }
   }
 
   goForward = (e: any) => {
-      if(this.moveIndex >= this.myMoves.length - 1) {
-          return;
-     }
-
-    this.moveIndex++;
-    this.scene.add(this.myMoves[this.moveIndex]);
+    if (this.moves.undone.length > 0) {
+      const m = this.moves.undone.pop();
+      this.scene.add(m.obj);
+      this.moves.played.push(m);
+      this.pieces[m.x][m.y] = m;
+    }
   }
 
   place(x: number, y: number) {
-      const tileX = (x + 9) / 2;
-      const tileY = (y + 9) / 2;
-      if(!this.alreadyFull(tileX, tileY)) {
-          return;
-      }
+    const tileX = (x + this.props.size) / 2;
+    const tileY = (y + this.props.size) / 2;
+
+    if (this.pieces[tileX][tileY] != null) {
+      return;
+    }
+    const wasX = this.moves.played.length ?
+      this.moves.played[this.moves.played.length - 1].isX :
+      false;
+    const move = wasX
+      ? { isX: false, obj: makeO(), x: tileX, y: tileY }
+      : { isX: true, obj: makeX(), x: tileX, y: tileY };
+    move.obj.position.set(x, y, .25);
+
+    this.scene.add(move.obj);
+    this.moves.played.push(move);
+    this.moves.undone = [];
+    this.pieces[tileX][tileY] = move;
+    if(this.isWinner(tileX, tileY)) {
+        console.log("winner");
+    }
+    /*
+    <<<<<<< HEAD
     const mat = new THREE.MeshPhongMaterial({ color: 0xff0000 });
     const donutGeometry = new THREE.TorusGeometry( 0.6, 0.2, 12, 45 );
     var donut = {geometry: donutGeometry, material: mat};
@@ -165,10 +186,12 @@ export class Board extends React.Component<BoardProps, {}> {
 
     }
     this.pieces[tileX][tileY] = placee;
-    if(this.isWinner(tileX, tileY)) {
-        console.log("winner");
-    }
   }
+  =======
+
+  >>>>>>> 6a80aa794e101e9a13dc8401f1dfce0c0002516d
+  */
+}
 
   isWinner(x:number, y:number):boolean {
       if(this.countPiecesHV(x, y, false) //horizontaly
@@ -186,15 +209,10 @@ export class Board extends React.Component<BoardProps, {}> {
   countPiecesHV(x:number, y:number, orientation:boolean):boolean {
       var sizeOfBoard = 9;
       var sum = 0;
-      var wanted;
       var tmp_x = x, tmp_y = y;
 
-      if(this.inGameShape) {
-          wanted = "O";
-      }
-      else {
-          wanted = "X";
-      }
+      var wanted = this.moves.played[this.moves.played.length - 1].isX;
+
 
 
       if (orientation == false) {
@@ -207,7 +225,7 @@ export class Board extends React.Component<BoardProps, {}> {
           if (this.pieces[tmp_x][tmp_y] == null) {
               break;
           }
-            if (this.pieces[tmp_x][tmp_y].name == wanted) {
+            if (this.pieces[tmp_x][tmp_y].isX == wanted) {
                 sum++;
                 if (orientation == false) {
                     tmp_x--;
@@ -229,7 +247,7 @@ export class Board extends React.Component<BoardProps, {}> {
           if (this.pieces[tmp_x][tmp_y] == null) {
               break;
           }
-            if (this.pieces[tmp_x][tmp_y].name == wanted) {
+            if (this.pieces[tmp_x][tmp_y].isX == wanted) {
                 sum++
                 if (orientation == false) {
                     tmp_x++;
@@ -251,22 +269,17 @@ export class Board extends React.Component<BoardProps, {}> {
  countPiecesDiagLtoR(x:number, y:number):boolean {
      var sizeOfBoard = 9;
      var sum = 0;
-     var wanted;
      var tmp_x = x, tmp_y = y;
 
-     if(this.inGameShape) {
-         wanted = "O";
-     }
-     else {
-         wanted = "X";
-     }
+     var wanted = this.moves.played[this.moves.played.length - 1].isX;
+
      tmp_x--;
      tmp_y--;
      while(tmp_x >= 0 && tmp_y >= 0) {
          if (this.pieces[tmp_x][tmp_y] == null) {
              break;
          }
-           if (this.pieces[tmp_x][tmp_y].name == wanted) {
+           if (this.pieces[tmp_x][tmp_y].isX == wanted) {
                sum++;
                tmp_x--;
                tmp_y--;
@@ -285,7 +298,7 @@ export class Board extends React.Component<BoardProps, {}> {
          if (this.pieces[tmp_x][tmp_y] == null) {
              break;
          }
-           if (this.pieces[tmp_x][tmp_y].name == wanted) {
+           if (this.pieces[tmp_x][tmp_y].isX == wanted) {
                sum++;
                    tmp_x++;
                    tmp_y++;
@@ -307,15 +320,10 @@ export class Board extends React.Component<BoardProps, {}> {
  countPiecesDiagRtoL(x:number, y:number):boolean {
      var sizeOfBoard = 9;
      var sum = 0;
-     var wanted;
      var tmp_x = x, tmp_y = y;
 
-     if(this.inGameShape) {
-         wanted = "O";
-     }
-     else {
-         wanted = "X";
-     }
+     var wanted = this.moves.played[this.moves.played.length - 1].isX;
+
 
      tmp_x++;
      tmp_y--;
@@ -323,7 +331,7 @@ export class Board extends React.Component<BoardProps, {}> {
          if (this.pieces[tmp_x][tmp_y] == null) {
              break;
          }
-           if (this.pieces[tmp_x][tmp_y].name == wanted) {
+           if (this.pieces[tmp_x][tmp_y].isX == wanted) {
                sum++;
                    tmp_x++;
                    tmp_y--;
@@ -342,7 +350,7 @@ export class Board extends React.Component<BoardProps, {}> {
          if (this.pieces[tmp_x][tmp_y] == null) {
              break;
          }
-           if (this.pieces[tmp_x][tmp_y].name == wanted) {
+           if (this.pieces[tmp_x][tmp_y].isX == wanted) {
                sum++;
                    tmp_x--;
                    tmp_y++;
@@ -359,12 +367,7 @@ export class Board extends React.Component<BoardProps, {}> {
      }
  }
 
-  alreadyFull(x: number, y:number): boolean  {
-        if (this.pieces[x][y] == null) {
-            return true;
-        }
-        return false;
-  }
+
 
   onWindowResize = () => {
     this.camera.aspect = window.innerWidth / window.innerHeight;
@@ -381,14 +384,14 @@ export class Board extends React.Component<BoardProps, {}> {
         </a>
         <div className="title"></div>
         <div>
-            <a href="#" onClick={this.goBack} className="goBack">
-                <img src="assets/left.png" height="12" />
-            </a>
+          <a href="#" onClick={this.goBack} className="goBack">
+            <img src="assets/left.png" height="12" />
+          </a>
         </div>
         <div>
-            <a href="#" onClick={this.goForward} className="goForward">
-                <img src="assets/right.png" height="12" />
-            </a>
+          <a href="#" onClick={this.goForward} className="goForward">
+            <img src="assets/right.png" height="12" />
+          </a>
         </div>
         <div><b>Menu</b></div>
       </div>
@@ -430,6 +433,41 @@ function makeControls(camera: THREE.Camera, renderer: THREE.Renderer): any {
   controls.dampingFactor = 0.25;
   controls.rotateSpeed = 0.4;
   return controls;
+}
+
+function makeX() {
+  const xShape = new THREE.Shape();
+  xShape.moveTo(-0.05, -0.25);
+  xShape.lineTo(0.05, -0.25);
+  xShape.lineTo(0.05, -0.05);
+  xShape.lineTo(0.25, -0.05);
+  xShape.lineTo(0.25, 0.05);
+  xShape.lineTo(0.05, 0.05);
+  xShape.lineTo(0.05, 0.25);
+  xShape.lineTo(-0.05, 0.25);
+  xShape.lineTo(-0.05, 0.05);
+  xShape.lineTo(-0.25, 0.05);
+  xShape.lineTo(-0.25, -0.05);
+  xShape.lineTo(-0.05, -0.05);
+  xShape.lineTo(-0.05, -0.25);
+
+  const obj = new THREE.Mesh(
+    new THREE.ExtrudeGeometry(xShape, {
+      amount: 0.2, bevelEnabled: false, bevelSegments: 2,
+      steps: 2, bevelSize: 1, bevelThickness: 1
+    }),
+    new THREE.MeshPhongMaterial({ color: 0x00ff00, side: THREE.DoubleSide }),
+  );
+  obj.scale.set(2.7, 2.7, 1);
+  obj.rotation.set(0, 0, Math.PI / 4);
+  return obj;
+}
+
+function makeO() {
+  return new THREE.Mesh(
+    new THREE.TorusGeometry(0.6, 0.2, 12, 45),
+    new THREE.MeshPhongMaterial({ color: 0xff0000 }),
+  );
 }
 
 function generateBoard(xSize: number, ySize: number, scene: THREE.Scene): THREE.Object3D[] {
