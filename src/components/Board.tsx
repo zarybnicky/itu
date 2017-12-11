@@ -111,7 +111,9 @@ export class Board extends React.Component<BoardProps, {}> {
   }
 
   place(x: number, y: number) {
-      if(!this.alreadyFull((x + 9) / 2, (y + 9) / 2)) {
+      const tileX = (x + 9) / 2;
+      const tileY = (y + 9) / 2;
+      if(!this.alreadyFull(tileX, tileY)) {
           return;
       }
     const mat = new THREE.MeshPhongMaterial({ color: 0xff0000 });
@@ -155,11 +157,207 @@ export class Board extends React.Component<BoardProps, {}> {
     this.myMoves = this.myMoves.slice(0, this.moveIndex);
     this.myMoves.push(placee);
 
+    if (this.inGameShape) {
+        placee.name = "O"
+    }
+    else {
+        placee.name = "X"
 
-    const tileX = (x + 9) / 2;
-    const tileY = (y + 9) / 2;
+    }
     this.pieces[tileX][tileY] = placee;
+    if(this.isWinner(tileX, tileY)) {
+        console.log("winner");
+    }
   }
+
+  isWinner(x:number, y:number):boolean {
+      if(this.countPiecesHV(x, y, false) //horizontaly
+      || this.countPiecesHV(x, y, true) //verticaly
+      || this.countPiecesDiagLtoR(x, y) //left to right
+      || this.countPiecesDiagRtoL(x, y)) { //right to left
+          return true;
+      }
+      else {
+          return false;
+      }
+
+  }
+
+  countPiecesHV(x:number, y:number, orientation:boolean):boolean {
+      var sizeOfBoard = 9;
+      var sum = 0;
+      var wanted;
+      var tmp_x = x, tmp_y = y;
+
+      if(this.inGameShape) {
+          wanted = "O";
+      }
+      else {
+          wanted = "X";
+      }
+
+
+      if (orientation == false) {
+          tmp_x = x - 1;
+      } else {
+          tmp_y = y - 1;
+      }
+
+      while(tmp_x >= 0) {
+          if (this.pieces[tmp_x][tmp_y] == null) {
+              break;
+          }
+            if (this.pieces[tmp_x][tmp_y].name == wanted) {
+                sum++;
+                if (orientation == false) {
+                    tmp_x--;
+                } else {
+                    tmp_y--;
+                }
+            }
+            else {
+                break;
+            }
+      }
+      if (orientation == false) {
+          tmp_x = x + 1;
+      } else {
+          tmp_y = y + 1;
+      }
+
+      while(tmp_x < sizeOfBoard) {
+          if (this.pieces[tmp_x][tmp_y] == null) {
+              break;
+          }
+            if (this.pieces[tmp_x][tmp_y].name == wanted) {
+                sum++
+                if (orientation == false) {
+                    tmp_x++;
+                } else {
+                    tmp_y++;
+                }
+            }
+            else {
+                break;
+            }
+      }
+    if (sum + 1 >= 5) {
+        return true;
+    } else {
+        return false;
+    }
+  }
+
+ countPiecesDiagLtoR(x:number, y:number):boolean {
+     var sizeOfBoard = 9;
+     var sum = 0;
+     var wanted;
+     var tmp_x = x, tmp_y = y;
+
+     if(this.inGameShape) {
+         wanted = "O";
+     }
+     else {
+         wanted = "X";
+     }
+     tmp_x--;
+     tmp_y--;
+     while(tmp_x >= 0 && tmp_y >= 0) {
+         if (this.pieces[tmp_x][tmp_y] == null) {
+             break;
+         }
+           if (this.pieces[tmp_x][tmp_y].name == wanted) {
+               sum++;
+               tmp_x--;
+               tmp_y--;
+           }
+           else {
+               break;
+           }
+     }
+
+     tmp_x = x;
+     tmp_y = y;
+
+     tmp_x++;
+     tmp_y++;
+     while(tmp_x < sizeOfBoard && tmp_y < sizeOfBoard) {
+         if (this.pieces[tmp_x][tmp_y] == null) {
+             break;
+         }
+           if (this.pieces[tmp_x][tmp_y].name == wanted) {
+               sum++;
+                   tmp_x++;
+                   tmp_y++;
+           }
+           else {
+               break;
+           }
+     }
+
+
+     if (sum + 1 >= 5) {
+         return true;
+     }
+     else {
+         return false;
+     }
+ }
+
+ countPiecesDiagRtoL(x:number, y:number):boolean {
+     var sizeOfBoard = 9;
+     var sum = 0;
+     var wanted;
+     var tmp_x = x, tmp_y = y;
+
+     if(this.inGameShape) {
+         wanted = "O";
+     }
+     else {
+         wanted = "X";
+     }
+
+     tmp_x++;
+     tmp_y--;
+     while(tmp_x < sizeOfBoard && tmp_y >= 0) {
+         if (this.pieces[tmp_x][tmp_y] == null) {
+             break;
+         }
+           if (this.pieces[tmp_x][tmp_y].name == wanted) {
+               sum++;
+                   tmp_x++;
+                   tmp_y--;
+           }
+           else {
+               break;
+           }
+     }
+
+     tmp_x = x;
+     tmp_y = y;
+
+     tmp_x--;
+     tmp_y++;
+     while(tmp_x >= 0 && tmp_y < sizeOfBoard) {
+         if (this.pieces[tmp_x][tmp_y] == null) {
+             break;
+         }
+           if (this.pieces[tmp_x][tmp_y].name == wanted) {
+               sum++;
+                   tmp_x--;
+                   tmp_y++;
+           }
+           else {
+               break;
+           }
+     }
+     if (sum + 1 >= 5) {
+         return true;
+     }
+     else {
+         return false;
+     }
+ }
 
   alreadyFull(x: number, y:number): boolean  {
         if (this.pieces[x][y] == null) {
