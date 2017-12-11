@@ -229,10 +229,10 @@ export class Board extends React.Component<BoardProps, {}> {
 
 function prepareScene(): THREE.Scene {
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xcccccc);
+  scene.background = new THREE.Color(0x2b385b);
 
   // lights
-  const light = new THREE.DirectionalLight(0xffffff);
+  const light = new THREE.DirectionalLight(0xffffff, 0.5);
   light.position.set(0, 0, 20);
   light.lookAt(new THREE.Vector3(0, 0, 0));
   scene.add(light);
@@ -241,7 +241,7 @@ function prepareScene(): THREE.Scene {
   light2.position.set(-1, -1, -1);
   scene.add(light2);
 
-  const light3 = new THREE.AmbientLight(0x555555);
+  const light3 = new THREE.AmbientLight(0x404040);
   scene.add(light3);
 
   return scene;
@@ -283,7 +283,7 @@ function makeX() {
       amount: 0.2, bevelEnabled: false, bevelSegments: 2,
       steps: 2, bevelSize: 1, bevelThickness: 1
     }),
-    new THREE.MeshPhongMaterial({ color: 0x00ff00, side: THREE.DoubleSide }),
+    new THREE.MeshPhongMaterial({ color: 0x05ff2b, side: THREE.DoubleSide }),
   );
   obj.scale.set(2.7, 2.7, 1);
   obj.rotation.set(0, 0, Math.PI / 4);
@@ -298,9 +298,9 @@ function makeO() {
 }
 
 function generateBoard(xSize: number, ySize: number, scene: THREE.Scene): THREE.Object3D[] {
-  const lineMaterial = new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 2 });
+  const lineMaterial = new THREE.LineBasicMaterial({ color: 0x2bd1eb, linewidth: 2 });
   const tileMaterial = new THREE.MeshPhongMaterial({
-    color: 0xffffff,
+    color: 0x2b5593,
     polygonOffset: true,
     polygonOffsetFactor: 1,
     polygonOffsetUnits: 1
