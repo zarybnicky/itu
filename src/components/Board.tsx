@@ -155,7 +155,8 @@ export class Board extends React.Component<BoardProps, {}> {
     }
   }
 
-  resetGame = () => {
+  resetGame = (e: any) => {
+    e.stopPropagation();
     this.moves.played.forEach(x => this.scene.remove(x.obj));
     this.moves.played = [];
     this.moves.undone = [];
@@ -164,6 +165,7 @@ export class Board extends React.Component<BoardProps, {}> {
     this.controls.reset();
     const overlay = document.getElementById('overlay');
     overlay.style.display = 'none';
+    this.waitingForReply = false;
   }
 
   waitForMove() {
@@ -172,7 +174,7 @@ export class Board extends React.Component<BoardProps, {}> {
       const move = findMove(this.pieces);
       this.waitingForReply = false;
       this.place((move.x * 2 - this.props.size), (move.y * 2 - this.props.size));
-    }, 500);
+    }, 250);
   }
 
   onWindowResize = () => {
