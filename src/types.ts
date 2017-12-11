@@ -17,3 +17,9 @@ export enum Difficulty {
   Medium = 'Medium',
   Hard = 'Hard',
 }
+export type Move = MoveInfo | 'undo';
+export interface MoveInfo {
+  isX: boolean;
+  x: number;
+  y: number;
+}

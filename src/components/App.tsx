@@ -15,6 +15,7 @@ interface AppState {
   music: number;
   variant: Variant;
   size: number;
+  singlePlayer: boolean;
 }
 
 export class App extends React.Component<{}, AppState> {
@@ -24,8 +25,17 @@ export class App extends React.Component<{}, AppState> {
     music: 50,
     variant: Variant.fiveInARow,
     size: 9,
+    singlePlayer: false,
   }
-  switchPage = (page: Page) => () => this.setState({ page });
+  switchPage = (page: Page) => () => {
+    if (this.state.page === Page.SinglePlayer && page === Page.Board) {
+      this.setState({ page, singlePlayer: true });
+    } else if (this.state.page === Page.SinglePlayer && page === Page.Board) {
+      this.setState({ page, singlePlayer: false });
+    } else {
+      this.setState({ page });
+    }
+  }
   onSoundChange = (sound: number) => this.setState({ sound });
   onMusicChange = (music: number) => this.setState({ music });
   onVariantChange = (variant: Variant) => this.setState({ variant });
@@ -75,7 +85,7 @@ export class App extends React.Component<{}, AppState> {
 
   render() {
     const { switchPage, onSoundChange, onMusicChange, onSizeChange, onVariantChange } = this;
-    const { sound, music, size, variant } = this.state;
+    const { sound, music, size, variant, singlePlayer } = this.state;
     switch (this.state.page) {
       case Page.Home:
         return <Home switchPage={this.switchPage} />;
@@ -88,7 +98,7 @@ export class App extends React.Component<{}, AppState> {
       case Page.Help:
         return <Help {...{ switchPage }} />;
       case Page.Board:
-        return <Board {...{ switchPage, size, variant }} />;
+        return <Board {...{ switchPage, size, variant, singlePlayer }} />;
     }
   }
 }

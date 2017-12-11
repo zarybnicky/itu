@@ -4,31 +4,31 @@ import 'three/examples/js/loaders/OBJLoader';
 import * as React from "react";
 import { Page } from '../types';
 import { OrbitControls } from '../OrbitControls';
-import { Variant } from '../types';
+import { Variant, Move, MoveInfo } from '../types';
 
-interface Move {
+interface MoveObj {
   obj: THREE.Object3D;
-  isX: boolean;
-  x: number;
-  y: number;
+  info: MoveInfo;
 }
 interface BoardProps {
   switchPage: (p: Page) => () => void;
   size: number;
   variant: Variant;
+  singlePlayer: boolean;
 }
 export class Board extends React.Component<BoardProps, {}> {
   renderer: THREE.WebGLRenderer;
   camera: THREE.PerspectiveCamera;
   domElement: HTMLElement;
   tiles: THREE.Object3D[] = [];
-  pieces: (Move | null)[][];
+  pieces: (MoveObj | null)[][];
   scene: THREE.Scene;
   moves = {
-    played: [] as Move[],
-    undone: [] as Move[],
+    played: [] as MoveObj[],
+    undone: [] as MoveObj[],
   };
   mouse: THREE.Vector2;
+  waitingForReply = false;
 
   componentDidMount() {
     const size = this.props.size;
@@ -96,20 +96,28 @@ export class Board extends React.Component<BoardProps, {}> {
   }
 
   goBack = () => {
-    if (this.moves.played.length > 0) {
-      const m = this.moves.played.pop();
-      this.scene.remove(m.obj);
-      this.moves.undone.push(m);
-      this.pieces[m.x][m.y] = null;
+    if (this.moves.played.length <= 0) {
+      return;
+    }
+    const m = this.moves.played.pop();
+    this.scene.remove(m.obj);
+    this.moves.undone.push(m);
+    this.pieces[m.info.x][m.info.y] = null;
+    if (!m.info.isX) {
+      this.goBack();
     }
   }
 
-  goForward = (e: any) => {
-    if (this.moves.undone.length > 0) {
-      const m = this.moves.undone.pop();
-      this.scene.add(m.obj);
-      this.moves.played.push(m);
-      this.pieces[m.x][m.y] = m;
+  goForward = () => {
+    if (this.moves.undone.length <= 0) {
+      return;
+    }
+    const m = this.moves.undone.pop();
+    this.scene.add(m.obj);
+    this.moves.played.push(m);
+    this.pieces[m.info.x][m.info.y] = m;
+    if (m.info.isX) {
+      this.goForward();
     }
   }
 
@@ -117,257 +125,62 @@ export class Board extends React.Component<BoardProps, {}> {
     const tileX = (x + this.props.size) / 2;
     const tileY = (y + this.props.size) / 2;
 
-    if (this.pieces[tileX][tileY] != null) {
+    if (this.waitingForReply || this.pieces[tileX][tileY] != null) {
       return;
     }
     const wasX = this.moves.played.length ?
-      this.moves.played[this.moves.played.length - 1].isX :
+      this.moves.played[this.moves.played.length - 1].info.isX :
       false;
     const move = wasX
-      ? { isX: false, obj: makeO(), x: tileX, y: tileY }
-      : { isX: true, obj: makeX(), x: tileX, y: tileY };
+      ? { info: { x: tileX, y: tileY, isX: false }, obj: makeO() }
+      : {
+        info: {
+          x: tileX, y: tileY, isX: true
+        }, obj: makeX()
+      };
     move.obj.position.set(x, y, .25);
 
     this.scene.add(move.obj);
     this.moves.played.push(move);
     this.moves.undone = [];
     this.pieces[tileX][tileY] = move;
-    if(this.isWinner(tileX, tileY)) {
-        console.log("winner");
+    if (this.isWinner(tileX, tileY)) {
+      console.log("winner");
     }
-    /*
-    <<<<<<< HEAD
-    const mat = new THREE.MeshPhongMaterial({ color: 0xff0000 });
-    const donutGeometry = new THREE.TorusGeometry( 0.6, 0.2, 12, 45 );
-    var donut = {geometry: donutGeometry, material: mat};
-
-    var xShape = new THREE.Shape();
-    xShape.moveTo(-0.05, -0.25);
-    xShape.lineTo(0.05, -0.25);
-    xShape.lineTo(0.05, -0.05);
-    xShape.lineTo(0.25, -0.05);
-    xShape.lineTo(0.25, 0.05);
-    xShape.lineTo(0.05, 0.05);
-    xShape.lineTo(0.05, 0.25);
-    xShape.lineTo(-0.05, 0.25);
-    xShape.lineTo(-0.05, 0.05);
-    xShape.lineTo(-0.25, 0.05);
-    xShape.lineTo(-0.25, -0.05);
-    xShape.lineTo(-0.05, -0.05);
-    xShape.lineTo(-0.05, -0.25);
-
-    var extrudeSettings = { amount: 0.2, bevelEnabled: false, bevelSegments: 2, steps: 2, bevelSize: 1, bevelThickness: 1};
-    var xGeometry = new THREE.ExtrudeGeometry( xShape, extrudeSettings );
-
-    var placee;
-    if (this.inGameShape)  {
-      placee = new THREE.Mesh( xGeometry, new THREE.MeshPhongMaterial( { color: 0x00ff00, side: THREE.DoubleSide } ) );
-      this.inGameShape = 0;
-      placee.scale.set(2.7, 2.7, 1);
-      placee.rotation.set(0, 0, Math.PI / 4);
-    } else {
-      placee = new THREE.Mesh( donut.geometry, donut.material );
-      this.inGameShape = 1;
-    }
-    placee.position.x = x;
-    placee.position.y = y;
-    placee.position.z = .75;
-    this.scene.add(placee);
-
-    this.moveIndex++;
-    this.myMoves = this.myMoves.slice(0, this.moveIndex);
-    this.myMoves.push(placee);
-
-    if (this.inGameShape) {
-        placee.name = "O"
-    }
-    else {
-        placee.name = "X"
-
-    }
-    this.pieces[tileX][tileY] = placee;
-  }
-  =======
-
-  >>>>>>> 6a80aa794e101e9a13dc8401f1dfce0c0002516d
-  */
-}
-
-  isWinner(x:number, y:number):boolean {
-      if(this.countPiecesHV(x, y, false) //horizontaly
-      || this.countPiecesHV(x, y, true) //verticaly
-      || this.countPiecesDiagLtoR(x, y) //left to right
-      || this.countPiecesDiagRtoL(x, y)) { //right to left
-          return true;
-      }
-      else {
-          return false;
-      }
-
-  }
-
-  countPiecesHV(x:number, y:number, orientation:boolean):boolean {
-      var sizeOfBoard = 9;
-      var sum = 0;
-      var tmp_x = x, tmp_y = y;
-
-      var wanted = this.moves.played[this.moves.played.length - 1].isX;
-
-
-
-      if (orientation == false) {
-          tmp_x = x - 1;
-      } else {
-          tmp_y = y - 1;
-      }
-
-      while(tmp_x >= 0) {
-          if (this.pieces[tmp_x][tmp_y] == null) {
-              break;
-          }
-            if (this.pieces[tmp_x][tmp_y].isX == wanted) {
-                sum++;
-                if (orientation == false) {
-                    tmp_x--;
-                } else {
-                    tmp_y--;
-                }
-            }
-            else {
-                break;
-            }
-      }
-      if (orientation == false) {
-          tmp_x = x + 1;
-      } else {
-          tmp_y = y + 1;
-      }
-
-      while(tmp_x < sizeOfBoard) {
-          if (this.pieces[tmp_x][tmp_y] == null) {
-              break;
-          }
-            if (this.pieces[tmp_x][tmp_y].isX == wanted) {
-                sum++
-                if (orientation == false) {
-                    tmp_x++;
-                } else {
-                    tmp_y++;
-                }
-            }
-            else {
-                break;
-            }
-      }
-    if (sum + 1 >= 5) {
-        return true;
-    } else {
-        return false;
+    if (!wasX) {
+      this.waitForMove();
     }
   }
 
- countPiecesDiagLtoR(x:number, y:number):boolean {
-     var sizeOfBoard = 9;
-     var sum = 0;
-     var tmp_x = x, tmp_y = y;
+  waitForMove() {
+    this.waitingForReply = true;
+    setTimeout(() => {
+      const move = findMove(this.pieces);
+      this.waitingForReply = false;
+      this.place((move.x * 2 - this.props.size), (move.y * 2 - this.props.size));
+    }, 500);
+  }
 
-     var wanted = this.moves.played[this.moves.played.length - 1].isX;
+  isWinner(x: number, y: number): boolean {
+    const wanted = this.moves.played[this.moves.played.length - 1].info.isX;
 
-     tmp_x--;
-     tmp_y--;
-     while(tmp_x >= 0 && tmp_y >= 0) {
-         if (this.pieces[tmp_x][tmp_y] == null) {
-             break;
-         }
-           if (this.pieces[tmp_x][tmp_y].isX == wanted) {
-               sum++;
-               tmp_x--;
-               tmp_y--;
-           }
-           else {
-               break;
-           }
-     }
+    const ranges = [range(-1, -5), range(1, 5)];
+    const diagL = (i: number) => (this.pieces[x + i] || [])[y - i];
+    const diagR = (i: number) => (this.pieces[x + i] || [])[y + i];
+    const verti = (i: number) => (this.pieces[x + i] || [])[y];
+    const horiz = (i: number) => (this.pieces[x] || [])[y + i];
 
-     tmp_x = x;
-     tmp_y = y;
-
-     tmp_x++;
-     tmp_y++;
-     while(tmp_x < sizeOfBoard && tmp_y < sizeOfBoard) {
-         if (this.pieces[tmp_x][tmp_y] == null) {
-             break;
-         }
-           if (this.pieces[tmp_x][tmp_y].isX == wanted) {
-               sum++;
-                   tmp_x++;
-                   tmp_y++;
-           }
-           else {
-               break;
-           }
-     }
-
-
-     if (sum + 1 >= 5) {
-         return true;
-     }
-     else {
-         return false;
-     }
- }
-
- countPiecesDiagRtoL(x:number, y:number):boolean {
-     var sizeOfBoard = 9;
-     var sum = 0;
-     var tmp_x = x, tmp_y = y;
-
-     var wanted = this.moves.played[this.moves.played.length - 1].isX;
-
-
-     tmp_x++;
-     tmp_y--;
-     while(tmp_x < sizeOfBoard && tmp_y >= 0) {
-         if (this.pieces[tmp_x][tmp_y] == null) {
-             break;
-         }
-           if (this.pieces[tmp_x][tmp_y].isX == wanted) {
-               sum++;
-                   tmp_x++;
-                   tmp_y--;
-           }
-           else {
-               break;
-           }
-     }
-
-     tmp_x = x;
-     tmp_y = y;
-
-     tmp_x--;
-     tmp_y++;
-     while(tmp_x >= 0 && tmp_y < sizeOfBoard) {
-         if (this.pieces[tmp_x][tmp_y] == null) {
-             break;
-         }
-           if (this.pieces[tmp_x][tmp_y].isX == wanted) {
-               sum++;
-                   tmp_x--;
-                   tmp_y++;
-           }
-           else {
-               break;
-           }
-     }
-     if (sum + 1 >= 5) {
-         return true;
-     }
-     else {
-         return false;
-     }
- }
-
-
+    const consecutiveBools = (s: number = 0, xs: boolean[]) => {
+      let i = 0;
+      while (i < xs.length && xs[i]) i++;
+      return s + i;
+    }
+    return [diagL, diagR, verti, horiz]
+      .map((f: (x: number) => MoveObj) => ranges
+        .map(xs => xs.map(f).map(x => x && x.info && x.info.isX === wanted))
+        .reduce(consecutiveBools, 0))
+      .some(x => x >= 4);
+  }
 
   onWindowResize = () => {
     this.camera.aspect = window.innerWidth / window.innerHeight;
@@ -506,5 +319,19 @@ function generateBoard(xSize: number, ySize: number, scene: THREE.Scene): THREE.
 }
 
 function range(start: number, end: number) {
-  return Array.from({ length: (end - start) }, (v, k) => k + start);
+  const increasing = end >= start;
+  return Array.from(
+    { length: Math.abs(end - start) },
+    (v, k) => start + (increasing ? k : -k)
+  );
+}
+
+function findMove(board: (MoveObj | null)[][]): MoveInfo {
+  while (true) {
+    const x = Math.floor(Math.random() * board.length);
+    const y = Math.floor(Math.random() * board.length);
+    if (board[x][y] === null) {
+      return { x, y, isX: false };
+    }
+  }
 }
