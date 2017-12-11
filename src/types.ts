@@ -40,3 +40,11 @@ export const toVariant = (n: number) => {
     case 6: return Variant.sixInARow;
   }
 }
+
+export function range(start: number, end: number) {
+  const increasing = end >= start;
+  return Array.from(
+    { length: Math.abs(end - start) },
+    (v, k) => start + (increasing ? k : -k)
+  );
+}

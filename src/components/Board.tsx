@@ -4,7 +4,8 @@ import 'three/examples/js/loaders/OBJLoader';
 import * as React from "react";
 import { Page } from '../types';
 import { OrbitControls } from '../OrbitControls';
-import { Variant, fromVariant, Move, MoveInfo } from '../types';
+import { Variant, fromVariant, MoveInfo, range } from '../types';
+import { findMove, isWinner } from '../game-logic';
 
 interface MoveObj {
   obj: THREE.Object3D;
@@ -20,14 +21,16 @@ export class Board extends React.Component<BoardProps, {}> {
   renderer: THREE.WebGLRenderer;
   camera: THREE.PerspectiveCamera;
   domElement: HTMLElement;
+  mouse: THREE.Vector2;
+  controls: any;
+
   tiles: THREE.Object3D[] = [];
-  pieces: (MoveObj | null)[][];
+  pieces: MoveInfo[][];
   scene: THREE.Scene;
   moves = {
     played: [] as MoveObj[],
     undone: [] as MoveObj[],
   };
-  mouse: THREE.Vector2;
   waitingForReply = false;
 
   componentDidMount() {
@@ -44,10 +47,10 @@ export class Board extends React.Component<BoardProps, {}> {
     this.tiles = generateBoard(size, size, this.scene);
     this.pieces = Array.from({ length: size }).map(x => Array.from<{}, null>({ length: size }).fill(null));
 
-    const controls = makeControls(this.camera, this.renderer);
+    this.controls = makeControls(this.camera, this.renderer);
     const animate = () => {
       requestAnimationFrame(animate);
-      controls.update();
+      this.controls.update();
       this.renderer.render(this.scene, this.camera);
     };
     animate();
@@ -115,7 +118,7 @@ export class Board extends React.Component<BoardProps, {}> {
     const m = this.moves.undone.pop();
     this.scene.add(m.obj);
     this.moves.played.push(m);
-    this.pieces[m.info.x][m.info.y] = m;
+    this.pieces[m.info.x][m.info.y] = m.info;
     if (m.info.isX) {
       this.goForward();
     }
@@ -133,23 +136,34 @@ export class Board extends React.Component<BoardProps, {}> {
       false;
     const move = wasX
       ? { info: { x: tileX, y: tileY, isX: false }, obj: makeO() }
-      : {
-        info: {
-          x: tileX, y: tileY, isX: true
-        }, obj: makeX()
-      };
+      : { info: { x: tileX, y: tileY, isX: true }, obj: makeX() };
     move.obj.position.set(x, y, .25);
 
     this.scene.add(move.obj);
     this.moves.played.push(move);
     this.moves.undone = [];
-    this.pieces[tileX][tileY] = move;
-    if (this.isWinner(tileX, tileY)) {
-      console.log("winner");
-    }
-    if (!wasX) {
+    this.pieces[tileX][tileY] = move.info;
+
+    if (isWinner(this.pieces, move.info, this.props.variant)) {
+      const text = document.getElementById('victory-text');
+      const overlay = document.getElementById('overlay');
+      text.innerHTML = wasX ? 'You lost.' : 'You won!';
+      overlay.style.display = 'flex';
+      this.waitingForReply = true;
+    } else if (!wasX) {
       this.waitForMove();
     }
+  }
+
+  resetGame = () => {
+    this.moves.played.forEach(x => this.scene.remove(x.obj));
+    this.moves.played = [];
+    this.moves.undone = [];
+    this.pieces = Array.from({ length: this.props.size })
+      .map(x => Array.from<{}, null>({ length: this.props.size }).fill(null));
+    this.controls.reset();
+    const overlay = document.getElementById('overlay');
+    overlay.style.display = 'none';
   }
 
   waitForMove() {
@@ -159,28 +173,6 @@ export class Board extends React.Component<BoardProps, {}> {
       this.waitingForReply = false;
       this.place((move.x * 2 - this.props.size), (move.y * 2 - this.props.size));
     }, 500);
-  }
-
-  isWinner(x: number, y: number): boolean {
-    const wanted = this.moves.played[this.moves.played.length - 1].info.isX;
-    const variant = fromVariant(this.props.variant);
-
-    const ranges = [range(-1, -variant), range(1, variant)];
-    const diagL = (i: number) => (this.pieces[x + i] || [])[y - i];
-    const diagR = (i: number) => (this.pieces[x + i] || [])[y + i];
-    const verti = (i: number) => (this.pieces[x + i] || [])[y];
-    const horiz = (i: number) => (this.pieces[x] || [])[y + i];
-
-    const consecutiveBools = (s: number = 0, xs: boolean[]) => {
-      let i = 0;
-      while (i < xs.length && xs[i]) i++;
-      return s + i;
-    }
-    return [diagL, diagR, verti, horiz]
-      .map((f: (x: number) => MoveObj) => ranges
-        .map(xs => xs.map(f).map(x => x && x.info && x.info.isX === wanted))
-        .reduce(consecutiveBools, 0))
-      .some(x => x + 1 >= variant);
   }
 
   onWindowResize = () => {
@@ -193,9 +185,6 @@ export class Board extends React.Component<BoardProps, {}> {
     const { switchPage } = this.props;
     return <div className="wrapper">
       <div className="header">
-        <a href="#" onClick={switchPage(Page.Home)} className="back">
-          <img src="assets/left.png" height="12" /> Back
-        </a>
         <div className="title"></div>
         <div>
           <a href="#" onClick={this.goBack} className="goBack">
@@ -209,7 +198,15 @@ export class Board extends React.Component<BoardProps, {}> {
         </div>
         <div><b>Menu</b></div>
       </div>
-      <div id="container"></div>
+      <div id="container">
+        <div id="overlay">
+          <div className="menu">
+            <div id="victory-text">You won!</div>
+            <a href="#" onClick={this.resetGame}>New game</a>
+            <a href="#" onClick={switchPage(Page.Home)}>Main menu</a>
+          </div>
+        </div>
+      </div>
     </div>;
   }
 }
@@ -236,7 +233,7 @@ function prepareScene(): THREE.Scene {
 
 function makeCamera(): THREE.PerspectiveCamera {
   const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000);
-  camera.position.z = 20;
+  camera.position.z = 25;
   camera.up.set(0, 0, 1);
   return camera;
 }
@@ -317,22 +314,4 @@ function generateBoard(xSize: number, ySize: number, scene: THREE.Scene): THREE.
   });
 
   return objs;
-}
-
-function range(start: number, end: number) {
-  const increasing = end >= start;
-  return Array.from(
-    { length: Math.abs(end - start) },
-    (v, k) => start + (increasing ? k : -k)
-  );
-}
-
-function findMove(board: (MoveObj | null)[][]): MoveInfo {
-  while (true) {
-    const x = Math.floor(Math.random() * board.length);
-    const y = Math.floor(Math.random() * board.length);
-    if (board[x][y] === null) {
-      return { x, y, isX: false };
-    }
-  }
 }
