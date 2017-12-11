@@ -155,6 +155,11 @@ export class Board extends React.Component<BoardProps, {}> {
     }
   }
 
+  forfeit() {
+    const overlay = document.getElementById('forfeitOverlay');
+    overlay.style.display = 'flex';
+  }
+
   resetGame = (e: any) => {
     e.stopPropagation();
     this.moves.played.forEach(x => this.scene.remove(x.obj));
@@ -164,7 +169,9 @@ export class Board extends React.Component<BoardProps, {}> {
       .map(x => Array.from<{}, null>({ length: this.props.size }).fill(null));
     this.controls.reset();
     const overlay = document.getElementById('overlay');
+    const ffOverlay = document.getElementById('forfeitOverlay');
     overlay.style.display = 'none';
+    ffOverlay.style.display = 'none';
     this.waitingForReply = false;
   }
 
@@ -198,13 +205,20 @@ export class Board extends React.Component<BoardProps, {}> {
             <img src="assets/right.png" height="12" />
           </a>
         </div>
-        <div><b>Menu</b></div>
+        <div><a href="#" onClick={this.forfeit} className="forfeit">Forfeit</a></div>
       </div>
       <div id="container">
         <div id="overlay">
           <div className="menu">
             <div id="victory-text">You won!</div>
             <a href="#" onClick={this.resetGame}>New game</a>
+            <a href="#" onClick={switchPage(Page.Home)}>Main menu</a>
+          </div>
+        </div>
+        <div id="forfeitOverlay">
+          <div className="menu">
+            <div id="victory-text">You surrendered!</div>
+            <a href="#" onClick={this.resetGame}>Reset game</a>
             <a href="#" onClick={switchPage(Page.Home)}>Main menu</a>
           </div>
         </div>
