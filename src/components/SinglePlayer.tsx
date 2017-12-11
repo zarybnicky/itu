@@ -2,7 +2,7 @@ import * as React from "react";
 import { Page } from '../types';
 import Slider, { createSliderWithTooltip } from 'rc-slider';
 import Select, { Option } from 'rc-select';
-import { Variant } from '../types';
+import { Variant, fromVariant, toVariant } from '../types';
 
 interface Props {
   switchPage: (p: Page) => () => void;
@@ -44,20 +44,4 @@ export class SinglePlayer extends React.Component<Props, {}> {
 
 const formatSize = (n: number) => {
   return `${n}x${n}`;
-}
-const fromVariant = (v: Variant) => {
-  switch (v) {
-    case Variant.threeInARow: return 3;
-    case Variant.fourInARow: return 4;
-    case Variant.fiveInARow: return 5;
-    case Variant.sixInARow: return 6;
-  }
-}
-const toVariant = (n: number) => {
-  switch (n) {
-    case 3: return Variant.threeInARow;
-    case 4: return Variant.fourInARow;
-    case 5: return Variant.fiveInARow;
-    case 6: return Variant.sixInARow;
-  }
 }

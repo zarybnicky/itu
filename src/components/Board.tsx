@@ -4,7 +4,7 @@ import 'three/examples/js/loaders/OBJLoader';
 import * as React from "react";
 import { Page } from '../types';
 import { OrbitControls } from '../OrbitControls';
-import { Variant, Move, MoveInfo } from '../types';
+import { Variant, fromVariant, Move, MoveInfo } from '../types';
 
 interface MoveObj {
   obj: THREE.Object3D;
@@ -163,8 +163,9 @@ export class Board extends React.Component<BoardProps, {}> {
 
   isWinner(x: number, y: number): boolean {
     const wanted = this.moves.played[this.moves.played.length - 1].info.isX;
+    const variant = fromVariant(this.props.variant);
 
-    const ranges = [range(-1, -5), range(1, 5)];
+    const ranges = [range(-1, -variant), range(1, variant)];
     const diagL = (i: number) => (this.pieces[x + i] || [])[y - i];
     const diagR = (i: number) => (this.pieces[x + i] || [])[y + i];
     const verti = (i: number) => (this.pieces[x + i] || [])[y];
@@ -179,7 +180,7 @@ export class Board extends React.Component<BoardProps, {}> {
       .map((f: (x: number) => MoveObj) => ranges
         .map(xs => xs.map(f).map(x => x && x.info && x.info.isX === wanted))
         .reduce(consecutiveBools, 0))
-      .some(x => x >= 4);
+      .some(x => x + 1 >= variant);
   }
 
   onWindowResize = () => {
