@@ -37,7 +37,7 @@ export class Board extends React.Component<BoardProps, {}> {
     const size = this.props.size;
 
     this.domElement = document.getElementById('container');
-    this.renderer = new THREE.WebGLRenderer();
+    this.renderer = new THREE.WebGLRenderer({ antialias: true });
     this.renderer.setPixelRatio(window.devicePixelRatio);
     this.renderer.setSize(this.domElement.clientWidth, this.domElement.clientHeight);
     this.domElement.appendChild(this.renderer.domElement);
@@ -137,7 +137,8 @@ export class Board extends React.Component<BoardProps, {}> {
     const move = wasX
       ? { info: { x: tileX, y: tileY, isX: false }, obj: makeO() }
       : { info: { x: tileX, y: tileY, isX: true }, obj: makeX() };
-    move.obj.position.set(x, y, .25);
+    move.obj.position.x = x;
+    move.obj.position.y = y;
 
     this.scene.add(move.obj);
     this.moves.played.push(move);
@@ -229,19 +230,15 @@ export class Board extends React.Component<BoardProps, {}> {
 
 function prepareScene(): THREE.Scene {
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x2b385b);
+  scene.background = new THREE.Color(0xf4faff);
 
   // lights
-  const light = new THREE.DirectionalLight(0xffffff, 0.5);
-  light.position.set(0, 0, 20);
+  const light = new THREE.DirectionalLight(0xffffff);
+  light.position.set(0, 0, 10);
   light.lookAt(new THREE.Vector3(0, 0, 0));
   scene.add(light);
 
-  const light2 = new THREE.DirectionalLight(0xaaaaaa);
-  light2.position.set(-1, -1, -1);
-  scene.add(light2);
-
-  const light3 = new THREE.AmbientLight(0x404040);
+  const light3 = new THREE.AmbientLight(0xaaaaaa, .25);
   scene.add(light3);
 
   return scene;
@@ -287,14 +284,17 @@ function makeX() {
   );
   obj.scale.set(2.7, 2.7, 1);
   obj.rotation.set(0, 0, Math.PI / 4);
+  obj.position.z = 0.25;
   return obj;
 }
 
 function makeO() {
-  return new THREE.Mesh(
+  const mesh = new THREE.Mesh(
     new THREE.TorusGeometry(0.6, 0.2, 12, 45),
     new THREE.MeshPhongMaterial({ color: 0xff0000 }),
   );
+  mesh.position.z = 0.45;
+  return mesh;
 }
 
 function generateBoard(xSize: number, ySize: number, scene: THREE.Scene): THREE.Object3D[] {
@@ -303,7 +303,8 @@ function generateBoard(xSize: number, ySize: number, scene: THREE.Scene): THREE.
     color: 0x2b5593,
     polygonOffset: true,
     polygonOffsetFactor: 1,
-    polygonOffsetUnits: 1
+    polygonOffsetUnits: 1,
+    shininess: 15,
   });
   const objs: THREE.Object3D[] = [];
 
